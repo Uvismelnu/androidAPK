@@ -1,0 +1,465 @@
+package com.numel.abvcalculator.screens
+
+import MainViewModel
+import ScreenData
+import ScreenData1
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.numel.abvcalculator.data.circulationMetabolism
+
+@Composable
+fun CirculationMetabolism(
+    navController: NavController,
+    screenData: ScreenData,
+    screenData1: ScreenData1,
+    viewModel: MainViewModel
+) {
+    var txPO2arterial by rememberSaveable { mutableStateOf("") }
+    var txCO2venoso by rememberSaveable { mutableStateOf("") }
+    var txCO2arterial by rememberSaveable { mutableStateOf("") }
+    var txSaO2 by rememberSaveable { mutableStateOf("") }
+    var txSvO2 by rememberSaveable { mutableStateOf("") }
+    var txHb by rememberSaveable { mutableStateOf("") }
+    val maxLength = 6
+
+    Column(
+        modifier = Modifier
+            .background(Color.Cyan)
+            //.weight(2F)
+
+            .fillMaxSize()
+            .padding(
+                horizontal = 2.dp, vertical = 2.dp
+            ), verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+
+
+    ) {
+        Text(
+            text = "Ingrese todos los datos",
+            color = Color.Black,
+            fontSize = 22.sp,
+            fontStyle = FontStyle.Italic
+        )
+        LazyRow(
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 2.dp)
+                .align(Alignment.CenterHorizontally)
+
+        ) {
+            item {
+                var isPO2arterialError by remember { mutableStateOf(false) }
+                val blinkAlphaPO2arterial by animateFloatAsState(
+                    targetValue = if (isPO2arterialError) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txPO2arterial,
+                    onValueChange = { newValue ->
+                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        if (newValue.length <= maxLength) {
+                            txPO2arterial = sanitizedValue
+                        }
+                        val pO2arterialValue = sanitizedValue.toDoubleOrNull()
+                        isPO2arterialError =
+                            pO2arterialValue == null || pO2arterialValue < 20.0 || pO2arterialValue > 500.0
+
+                    },
+                    label = {
+                        Text(
+                            text = "PO2",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "arterial",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .background(Color.LightGray)
+                        .weight(2F)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(120.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.DarkGray,
+                        cursorColor = Color.Black
+                    ),
+                    isError = isPO2arterialError, // Show error state
+                    supportingText = {
+                        if (isPO2arterialError) {
+                            Text(
+                                text = "Valor entre 20.0 y 500.0",
+                                color = Color.Black.copy(alpha = blinkAlphaPO2arterial) // Apply alpha animation
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+
+
+                )
+                var isCO2arterialError by remember { mutableStateOf(false) }
+                val blinkAlphaCO2arterial by animateFloatAsState(
+                    targetValue = if (isCO2arterialError) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txCO2arterial,
+                    onValueChange = { newValue ->
+                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        if (newValue.length <= maxLength) {
+                            txCO2arterial = sanitizedValue
+                        }
+                        val co2ArterialValue = sanitizedValue.toDoubleOrNull()
+                        isCO2arterialError =
+                            co2ArterialValue == null || co2ArterialValue < 2.0 || co2ArterialValue > 300.0
+                    },
+                    label = {
+                        Text(
+                            text = "CO2",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "arterial",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .background(Color.LightGray)
+                        .weight(2F)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(120.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.DarkGray,
+                        cursorColor = Color.Black
+                    ),
+                    isError = isCO2arterialError, // Show error state
+                    supportingText = {
+                        if (isCO2arterialError) {
+                            Text(
+                                text = "Valor entre 2.0 y 300.0",
+                                color = Color.Black.copy(alpha = blinkAlphaCO2arterial) // Apply alpha animation
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+
+
+                )
+
+            }
+        }
+        LazyRow(
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 2.dp)
+                .align(Alignment.CenterHorizontally)
+
+        ) {
+            item {var isSaO2Error by remember { mutableStateOf(false) }
+                val blinkAlphaSaO2 by animateFloatAsState(
+                    targetValue = if (isSaO2Error) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txSaO2,
+                    onValueChange = { newValue ->
+                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        if (newValue.length <= maxLength) {
+                            txSaO2 = sanitizedValue
+                        }
+                        val sao2Value = sanitizedValue.toDoubleOrNull()
+                        isSaO2Error = sao2Value == null || sao2Value < 10 || sao2Value > 100.0
+                    },
+                    label = {
+                        Text(
+                            text = "SO2",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "arterial",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .background(Color.LightGray)
+                        .weight(2F)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(120.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.DarkGray,
+                        cursorColor = Color.Black
+                    ),
+                    isError = isSaO2Error, // Show error state
+                    supportingText = {
+                        if (isSaO2Error) {
+                            Text(
+                                text = "Valor entre 10.0 y 100.0",
+                                color = Color.Black.copy(alpha = blinkAlphaSaO2) // Apply alpha animation
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+
+
+                )
+                var isCO2venosoError by remember { mutableStateOf(false) }
+                val blinkAlphaCO2venoso by animateFloatAsState(
+                    targetValue = if (isCO2venosoError) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txCO2venoso,
+                    onValueChange = { newValue ->
+                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        if (newValue.length <= maxLength) {
+                            txCO2venoso = sanitizedValue
+                        }
+                        val co2VenosoValue = sanitizedValue.toDoubleOrNull()
+                        isCO2venosoError =
+                            co2VenosoValue == null || co2VenosoValue < 0.1 || co2VenosoValue > 200.0
+                    },
+                    label = {
+                        Text(
+                            text = "CO2",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "venoso",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .background(Color.DarkGray)
+                        .weight(2F)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(120.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.LightGray,
+                        cursorColor = Color.White
+                    ),
+                    isError = isCO2venosoError, // Show error state
+                    supportingText = {
+                        if (isCO2venosoError) {
+                            Text(
+                                text = "Valor entre 0.1 y 200.0",
+                                color = Color.White.copy(alpha = blinkAlphaCO2venoso) // Apply alpha animation
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+
+
+                )
+            }
+        }
+        LazyRow(
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 2.dp)
+                .align(Alignment.CenterHorizontally)
+
+        ) {
+            item {
+                var isSvO2Error by remember { mutableStateOf(false) }
+                val blinkAlphaSvO2 by animateFloatAsState(
+                    targetValue = if (isSvO2Error) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txSvO2,
+                    onValueChange = { newValue ->
+                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        if (newValue.length <= maxLength) {
+                            txSvO2 = sanitizedValue
+                        }
+                        val svO2Value = sanitizedValue.toDoubleOrNull()
+                        isSvO2Error = svO2Value == null || svO2Value < 10.0 || svO2Value > 100.0
+                    },
+                    label = {
+                        Text(
+                            text = "SO2",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "venosa",
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    },
+
+
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+
+                    modifier = Modifier
+                        .background(Color.DarkGray)
+                        .weight(2F)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(120.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.LightGray,
+                        cursorColor = Color.White
+                    ),
+                    isError = isSvO2Error, // Show error state
+                    supportingText = {
+                        if (isSvO2Error) {
+                            Text(
+                                text = "Valor entre 10.0 y 100.0",
+                                color = Color.White.copy(alpha = blinkAlphaSvO2) // Apply alpha animation
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+
+
+                )
+                Spacer(modifier = Modifier.size(5.dp))
+
+                var isHbError by remember { mutableStateOf(false) }
+                val blinkAlphaHb by animateFloatAsState(
+                    targetValue = if (isHbError) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txHb,
+                    onValueChange = { newValue ->
+                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        if (newValue.length <= maxLength) {
+                            txHb = sanitizedValue
+                        }
+                        val hbValue = sanitizedValue.toDoubleOrNull()
+                        isHbError = hbValue == null || hbValue < 1.0 || hbValue > 25.0
+                    },
+                    label = {
+                        Text(
+                            text = "HB",
+                            color = Color.Black,
+                            fontSize = 12.sp
+                        )
+                    },
+
+
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+
+                    modifier = Modifier
+                        .background(Color.LightGray)
+                        .weight(2F)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(120.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.DarkGray,
+                        cursorColor = Color.Black
+                    ),
+                    isError = isHbError, // Show error state
+                    supportingText = {
+                        if (isHbError) {
+                            Text(
+                                text = "Valor entre 1.0 y 25.0",
+                                color = Color.Black.copy(alpha = blinkAlphaHb) // Apply alpha animation
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+
+
+                )
+            }
+        }
+        Button(
+            onClick = {
+                viewModel.updateCirMetab(circulationMetabolism(txPO2arterial.toDouble(),txCO2arterial.toDouble(),txCO2venoso.toDouble(),txHb.toDouble(),txSaO2.toDouble(),txSvO2.toDouble())) // Update the ViewModel with the first TextField's value
+
+                navController.popBackStack()
+            },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Guardar y volver")
+        }
+    }
+
+
+}
