@@ -47,3 +47,20 @@ object HemoglobinOb
 object ClassifyPaO2Ob
 @Serializable
 object ClassifyPvO2Ob
+@Serializable
+object ClassifySaO2Ob
+@Serializable
+object ChlorineOb
+@Serializable
+object EvaluateSvO2Ob
+@Serializable
+object PotassiumOb
+@Serializable
+object SodiumOb
+@Serializable
+object OxygenConsumpOb
+@Serializable
+object ClassifyPaCO2Ob
+
+
+

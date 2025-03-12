@@ -100,12 +100,18 @@ class MainViewModel : ViewModel() {
     fun updateCirMetab(newValue: String) {
         _circMetab.value = newValue
     }
+    private val _oxygenConsump = mutableStateOf("")  //6
+    val oxygenConsump: State<String> = _oxygenConsump
+    fun updateOxygenConsump(newValue: String) {
+        _oxygenConsump.value = newValue
+    }
 
 
     // Correctly calculate resultText as a State<String> that updates automatically
     val resultText: State<String> = derivedStateOf {
         text.value + text1.value + txNa.value +
-                txCa.value + cirMetab.value + txHCO3.value + txHb.value + txPO2arterial.value + txCO2venoso.value
+                txCa.value + cirMetab.value + txHCO3.value + txHb.value + txPO2arterial.value + txCO2venoso.value +
+                txSaO2.value + txCl.value + txSvO2.value + txK.value + oxygenConsump.value + txCO2arterial.value
 
     }
 }

@@ -24,7 +24,14 @@ fun MainScreen(
     toBicarbonate: () -> Unit,
     toHemoglobin: () -> Unit,
     toPO2arterial: () -> Unit,
-    toPO2venous: () -> Unit
+    toPO2venous: () -> Unit,
+    toSatArterialO2: () -> Unit,
+    toChlorine: () -> Unit,
+    toSatVenousO2: () -> Unit,
+    toPotassium: () -> Unit,
+    toSodium: () -> Unit,
+    toOxygenConsump: () -> Unit,
+    toClassifyPaCO2: () -> Unit
 ) {
     val text = viewModel.resultText// Obtener el texto actual del ViewModel
     val screenData = ScreenData(text.value) // Crear un objeto ScreenData con el texto actual
@@ -70,6 +77,27 @@ fun MainScreen(
         }
         Button(onClick = { toPO2venous() }) {
             Text("Ir a PO2venoso")
+        }
+        Button(onClick = { toSatArterialO2() }) {
+            Text("Ir a Sat. arterial O2")
+        }
+        Button(onClick = { toChlorine() }) {
+            Text("Ir a Cloruro")
+        }
+        Button(onClick = { toSatVenousO2() }) {
+            Text("Ir a Sat. venosa O2")
+        }
+        Button(onClick = { toPotassium() }) {
+            Text("Ir a Potasio")
+        }
+        Button(onClick = { toSodium() }) {
+            Text("Ir a Sodio")
+        }
+        Button(onClick = { toOxygenConsump() }) {
+            Text("Ir a Consumo de Oxigeno")
+        }
+        Button(onClick = { toClassifyPaCO2() }) {
+            Text("Ir a CO2 arterial")
         }
 
     }
