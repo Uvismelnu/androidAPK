@@ -1,3 +1,4 @@
+package com.numel.abvcalculator.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -14,9 +15,13 @@ import com.numel.abvcalculator.screens.ClassifyPaO2
 import com.numel.abvcalculator.screens.ClassifyPvCO2
 import com.numel.abvcalculator.screens.ClassifySaO2
 import com.numel.abvcalculator.screens.EvaluateSvO2
+import com.numel.abvcalculator.screens.MainScreen
 import com.numel.abvcalculator.screens.OxygenConsump
 import com.numel.abvcalculator.screens.Potassium
+import com.numel.abvcalculator.screens.Screen1
+import com.numel.abvcalculator.screens.Screen2
 import com.numel.abvcalculator.screens.Sodium
+import com.numel.abvcalculator.viewModel.MainViewModel
 
 @Composable
 fun NavigationWrapper(viewModel: MainViewModel, modifier: Modifier) {
@@ -39,7 +44,8 @@ fun NavigationWrapper(viewModel: MainViewModel, modifier: Modifier) {
 
     NavHost(navController = navController, startDestination = Main) {
         composable<Main> {
-            MainScreen(viewModel,
+            MainScreen(
+                viewModel,
                 { navController.navigate(Screen1) },
                 { navController.navigate(Screen2) },
                 { navController.navigate(AcidoBase) },

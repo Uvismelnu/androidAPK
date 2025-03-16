@@ -1,8 +1,5 @@
 package com.numel.abvcalculator.screens
 
-import MainViewModel
-import ScreenData
-import ScreenData1
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -37,8 +34,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.numel.abvcalculator.data.calcium
-import com.numel.arancel.classifyHemoglobin
+import com.numel.abvcalculator.navigation.ScreenData
+import com.numel.abvcalculator.navigation.ScreenData1
+import com.numel.abvcalculator.viewModel.MainViewModel
+import com.numel.abvcalculator.data.classifyHemoglobin
 
 @Composable
 fun ClassifyHemoglobin(
@@ -53,8 +52,6 @@ fun ClassifyHemoglobin(
     Column(
         modifier = Modifier
             .background(Color.Cyan)
-            //.weight(2F)
-
             .fillMaxSize()
             .padding(
                 horizontal = 2.dp, vertical = 2.dp

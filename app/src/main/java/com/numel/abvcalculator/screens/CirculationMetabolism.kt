@@ -1,8 +1,5 @@
 package com.numel.abvcalculator.screens
 
-import MainViewModel
-import ScreenData
-import ScreenData1
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -40,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.numel.abvcalculator.data.circulationMetabolism
+import com.numel.abvcalculator.navigation.ScreenData
+import com.numel.abvcalculator.navigation.ScreenData1
+import com.numel.abvcalculator.viewModel.MainViewModel
 
 @Composable
 fun CirculationMetabolism(

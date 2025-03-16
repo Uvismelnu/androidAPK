@@ -1,8 +1,5 @@
 package com.numel.abvcalculator.screens
 
-import MainViewModel
-import ScreenData
-import ScreenData1
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,7 +20,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,10 +36,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.numel.abvcalculator.data.acidobase
+import com.numel.abvcalculator.navigation.ScreenData
+import com.numel.abvcalculator.navigation.ScreenData1
+import com.numel.abvcalculator.viewModel.MainViewModel
 
 
 @Composable
-fun AcidoBase(navController: NavController, screenData: ScreenData,screenData1: ScreenData1, viewModel: MainViewModel) {
+fun AcidoBase(navController: NavController, screenData: ScreenData, screenData1: ScreenData1, viewModel: MainViewModel) {
     var newText1 by remember { mutableStateOf(screenData.text) }
     var txPharterial by rememberSaveable { mutableStateOf("") }
     var txCO2arterial by rememberSaveable { mutableStateOf("") }
@@ -52,7 +51,6 @@ fun AcidoBase(navController: NavController, screenData: ScreenData,screenData1: 
     var txK by rememberSaveable { mutableStateOf("") }
     var txCl by rememberSaveable { mutableStateOf("") }
     val maxLength = 6
-    var newtxNa by remember { mutableStateOf(screenData1.txNa) }
 
     Column(
         modifier = Modifier
@@ -232,8 +230,7 @@ fun AcidoBase(navController: NavController, screenData: ScreenData,screenData1: 
                         .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
-                    //.navigationBarsWithImePadding(),
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.LightGray,
@@ -415,12 +412,25 @@ fun AcidoBase(navController: NavController, screenData: ScreenData,screenData1: 
 
         Button(
             onClick = {
-                viewModel.updateText1(acidobase(txHCO3.toDouble(),txCO2arterial.toDouble(),txPharterial.toDouble(),txNa.toDouble(),txK.toDouble(),txCl.toDouble())) // Update the ViewModel with the first TextField's value
+                // Validar que todos los campos tengan valores numéricos
+                val phVal = txPharterial.toDoubleOrNull()
+                val co2Val = txCO2arterial.toDoubleOrNull()
+                val hco3Val = txHCO3.toDoubleOrNull()
+                val naVal = txNa.toDoubleOrNull()
+                val kVal = txK.toDoubleOrNull()
+                val clVal = txCl.toDoubleOrNull()
 
-                navController.popBackStack()
-            },
-            modifier = Modifier.padding(8.dp)
-        ) {
+                if (phVal != null && co2Val != null && hco3Val != null && naVal != null && kVal != null && clVal != null) {
+                    viewModel.updateText1(acidobase(hco3Val, co2Val, phVal, naVal, kVal, clVal))
+                    viewModel.updateTxPharterial(txPharterial)
+                    viewModel.updateTxCO2arterial(txCO2arterial)
+                    viewModel.isScreen1Visible = true
+                    navController.popBackStack()
+                } else {
+                    // Mostrar error al usuario (puedes agregar un Toast o Snackbar)
+                    //Toast.makeText("Por favor, ingrese valores numéricos válidos en todos los campos.", Toast.LENGTH_SHORT).show()
+                }
+            }) {
             Text("Guardar y volver")
         }
     }

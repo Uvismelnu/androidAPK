@@ -1,18 +1,23 @@
+package com.numel.abvcalculator.viewModel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
+    var isScreen1Visible by mutableStateOf(false)
 
-    private val _txPharterial = mutableStateOf("") //1
+
+    private val _txPharterial = mutableStateOf("")
     val txPharterial: State<String> = _txPharterial
+
     fun updateTxPharterial(newValue: String) {
         _txPharterial.value = newValue
     }
+
+
 
     private val _txCO2arterial = mutableStateOf("")  //2
     val txCO2arterial: State<String> = _txCO2arterial
@@ -109,7 +114,7 @@ class MainViewModel : ViewModel() {
 
     // Correctly calculate resultText as a State<String> that updates automatically
     val resultText: State<String> = derivedStateOf {
-        text.value + text1.value + txNa.value +
+        text.value + txPharterial.value + text1.value + txNa.value +
                 txCa.value + cirMetab.value + txHCO3.value + txHb.value + txPO2arterial.value + txCO2venoso.value +
                 txSaO2.value + txCl.value + txSvO2.value + txK.value + oxygenConsump.value + txCO2arterial.value
 

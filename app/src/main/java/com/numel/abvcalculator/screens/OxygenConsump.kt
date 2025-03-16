@@ -1,9 +1,5 @@
 package com.numel.abvcalculator.screens
 
-import MainViewModel
-import ScreenData
-import ScreenData1
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,16 +13,16 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.numel.abvcalculator.navigation.ScreenData
+import com.numel.abvcalculator.navigation.ScreenData1
+import com.numel.abvcalculator.viewModel.MainViewModel
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -34,7 +30,8 @@ import kotlin.math.pow
 fun OxygenConsump(navController: NavController,
                   screenData: ScreenData,
                   screenData1: ScreenData1,
-                  viewModel: MainViewModel) {
+                  viewModel: MainViewModel
+) {
 
     val weight = remember { mutableStateOf("") }
     val height = remember { mutableStateOf("") }

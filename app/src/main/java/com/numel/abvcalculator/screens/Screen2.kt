@@ -1,3 +1,4 @@
+package com.numel.abvcalculator.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -11,6 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.numel.abvcalculator.navigation.ScreenData
+import com.numel.abvcalculator.viewModel.MainViewModel
 
 @Composable
 fun Screen2(navController: NavController, screenData: ScreenData, viewModel: MainViewModel) {
