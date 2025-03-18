@@ -465,7 +465,7 @@ fun AcidoBase(
                     navController.popBackStack()
                 } else {
 
-                    Toast.makeText(context, "Por favor, ingrese valores numéricos válidos en todos los campos.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT).show()
                 }
             }) {
             Text("Guardar y volver")
