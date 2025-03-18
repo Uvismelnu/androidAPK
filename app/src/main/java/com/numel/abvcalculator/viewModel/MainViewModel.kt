@@ -8,6 +8,10 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
     var isScreen1Visible by mutableStateOf(false)
+    var isScreenCO2100_160_H_0_100Visible by mutableStateOf(false)
+    var isScreenCO2100_160_H_100_160Visible by mutableStateOf(false)
+    var isScreenCO2_0_100_h100_160Visible by mutableStateOf(false)
+
 
 
     private val _txPharterial = mutableStateOf("")
