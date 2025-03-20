@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,12 +50,12 @@ fun AcidoBase(
     viewModel: MainViewModel
 ) {
     var newText1 by remember { mutableStateOf(screenData.text) }
-    var txPharterial by rememberSaveable { mutableStateOf("") }
-    var txCO2arterial by rememberSaveable { mutableStateOf("") }
-    var txHCO3 by rememberSaveable { mutableStateOf("") }
-    var txNa by rememberSaveable { mutableStateOf("") }
-    var txK by rememberSaveable { mutableStateOf("") }
-    var txCl by rememberSaveable { mutableStateOf("") }
+    var txPharterial by remember { mutableStateOf(viewModel.sharedPHa.value) }
+    var txCO2arterial by remember { mutableStateOf(viewModel.sharedCO2a.value) }
+    var txHCO3 by remember { mutableStateOf(viewModel.sharedHCO3.value) }
+    var txNa by remember { mutableStateOf(viewModel.sharedNa.value) }
+    var txK by remember { mutableStateOf(viewModel.sharedK.value) }
+    var txCl by remember { mutableStateOf(viewModel.sharedCl.value) }
     val maxLength = 6
     val context = LocalContext.current // Obtiene el contexto actual
 
@@ -100,6 +99,7 @@ fun AcidoBase(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txPharterial = sanitizedValue
+                            viewModel.updateSharedPHa(txPharterial)
                         }
                         val pharterialValue = sanitizedValue.toDoubleOrNull()
                         isPharterialError =
@@ -153,6 +153,7 @@ fun AcidoBase(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txCO2arterial = sanitizedValue
+                            viewModel.updateSharedCO2a(txCO2arterial)
                         }
                         val co2ArterialValue = sanitizedValue.toDoubleOrNull()
                         isCO2arterialError =
@@ -221,6 +222,7 @@ fun AcidoBase(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txHCO3 = sanitizedValue
+                            viewModel.updateSharedHCO3(txHCO3)
                         }
                         val hco3Value = sanitizedValue.toDoubleOrNull()
                         isHCO3Error = hco3Value == null || hco3Value < 1.0 || hco3Value > 50.0
@@ -271,6 +273,7 @@ fun AcidoBase(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txNa = sanitizedValue
+                            viewModel.updateSharedNa(txNa)
 
                         }
                         val naValue = sanitizedValue.toDoubleOrNull()
@@ -331,6 +334,7 @@ fun AcidoBase(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txK = sanitizedValue
+                            viewModel.updateSharedK(txK)
                         }
                         val kValue = sanitizedValue.toDoubleOrNull()
                         isKError = kValue == null || kValue < 0.5 || kValue > 10.0
@@ -378,6 +382,7 @@ fun AcidoBase(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txCl = sanitizedValue
+                            viewModel.updateSharedCl(txCl)
                         }
                         val clValue = sanitizedValue.toDoubleOrNull()
                         isClError = clValue == null || clValue < 60.0 || clValue > 250.0
@@ -451,7 +456,7 @@ fun AcidoBase(
                         viewModel.isScreenCO2100_160_H_100_160Visible = true
                         viewModel.isScreen1Visible = false
                         viewModel.isScreenCO2_0_100_h100_160Visible = false
-                        viewModel.isScreenCO2100_160_H_0_100Visible = true
+                        viewModel.isScreenCO2100_160_H_0_100Visible = false
 
 
                     }

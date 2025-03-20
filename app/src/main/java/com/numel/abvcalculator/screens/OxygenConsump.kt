@@ -1,5 +1,6 @@
 package com.numel.abvcalculator.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,31 +18,35 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.numel.abvcalculator.navigation.ScreenData
 import com.numel.abvcalculator.navigation.ScreenData1
+import com.numel.abvcalculator.viewModel.Gender
 import com.numel.abvcalculator.viewModel.MainViewModel
 import kotlin.math.ln
 import kotlin.math.pow
 
 @Composable
-fun OxygenConsump(navController: NavController,
-                  screenData: ScreenData,
-                  screenData1: ScreenData1,
-                  viewModel: MainViewModel
+fun OxygenConsump(
+    navController: NavController,
+    screenData: ScreenData,
+    screenData1: ScreenData1,
+    viewModel: MainViewModel
 ) {
 
-    val weight = remember { mutableStateOf("") }
-    val height = remember { mutableStateOf("") }
-    val age = remember { mutableStateOf("") }
-    val heartRate = remember { mutableStateOf("") }
-    val vO2 = remember { mutableStateOf("") }
+    val weight = remember { mutableStateOf(viewModel.sharedWeight.value) }
+    val height = remember { mutableStateOf(viewModel.sharedHeight.value) }
+    val age = remember { mutableStateOf(viewModel.sharedAge.value) }
+    val heartRate = remember { mutableStateOf(viewModel.sharedHeartRate.value) }
+    val vO2 = remember { mutableStateOf(viewModel.sharedVO2.value) }
 
 
-    val bSA = remember { mutableStateOf("") }
-    val selectedGender = remember { mutableStateOf(Gender.MALE) }
+    val bSA = remember { mutableStateOf(viewModel.sharedBSA.value) }
+    val selectedGender = remember { mutableStateOf(viewModel.selectedGender.value) }
+    val context = LocalContext.current // Obtiene el contexto actual
 
     Column(
         modifier = Modifier
@@ -55,7 +60,8 @@ fun OxygenConsump(navController: NavController,
         Row {
             RadioButton(
                 selected = selectedGender.value == Gender.MALE,
-                onClick = { selectedGender.value = Gender.MALE }
+                onClick = { selectedGender.value = Gender.MALE
+                viewModel.updateSelectedGender(Gender.MALE) }
             )
             Text("Masculino")
 
@@ -63,7 +69,8 @@ fun OxygenConsump(navController: NavController,
 
             RadioButton(
                 selected = selectedGender.value == Gender.FEMALE,
-                onClick = { selectedGender.value = Gender.FEMALE }
+                onClick = { selectedGender.value = Gender.FEMALE
+                viewModel.updateSelectedGender(Gender.FEMALE) }
             )
             Text("Femenino")
         }
@@ -72,28 +79,32 @@ fun OxygenConsump(navController: NavController,
 
         OutlinedTextField(
             value = weight.value,
-            onValueChange = { weight.value = it },
+            onValueChange = { weight.value = it
+                            viewModel.updateSharedWeight(it)},
             label = { Text("Peso (kg)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = height.value,
-            onValueChange = { height.value = it },
+            onValueChange = { height.value = it
+                            viewModel.updateSharedHeight(it)},
             label = { Text("Talla (cm)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = age.value,
-            onValueChange = { age.value = it },
+            onValueChange = { age.value = it
+                            viewModel.updateSharedAge(it)},
             label = { Text("Edad (años)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = heartRate.value,
-            onValueChange = { heartRate.value = it },
+            onValueChange = { heartRate.value = it
+                            viewModel.updateSharedHeartRate(it)},
             label = { Text("FC (lpm)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -103,13 +114,36 @@ fun OxygenConsump(navController: NavController,
             val k = if (selectedGender.value == Gender.MALE) 11.49 else 17.04
             val weightValue = weight.value.toDoubleOrNull() ?: 0.0
             val heightValue = height.value.toDoubleOrNull() ?: 0.0
-            val ageValue = age.value.toDoubleOrNull() ?: 0
+            val ageValue = age.value.toDoubleOrNull() ?: 0.0
             val fc = heartRate.value.toIntOrNull() ?: 0
-            bSA.value= ((0.007184* heightValue.pow(0.725)) * (weightValue.pow(0.425))).toString()
-            vO2.value=(bSA.value.toDouble() * (138.1-(k * ln(ageValue.toDouble()))+(0.378 * fc.toDouble()))).toString()
 
-            viewModel.updateOxygenConsump("BSA: ${"%.2f".format(bSA.value.toDouble())}" + " m2." + " \nVO2: ${"%.2f".format(vO2.value.toDouble())}" + " mL/min.")
-            navController.popBackStack()
+            if(selectedGender.value==null){
+                Toast.makeText(context, "Seleccione un género.", Toast.LENGTH_SHORT).show()
+
+            }
+
+            else if (weightValue > 0 && heightValue > 0 && ageValue > 0 && fc > 0 && selectedGender.value != null) {
+                // Calculate BSA
+                val bsa = 0.007184 * heightValue.pow(0.725) * weightValue.pow(0.425)
+                viewModel.updateSharedBSA(bsa.toString())
+
+                // Calculate VO2
+                val vo2 = bsa * (138.1 - (k * ln(ageValue)) + (0.378 * fc))
+                viewModel.updateSharedVO2(vo2.toString())
+
+                // Update LiveData or State with formatted values
+                bSA.value = "%.2f".format(bsa)
+                vO2.value = "%.2f".format(vo2)
+
+                viewModel.updateOxygenConsump(
+                    "BSA: ${"%.2f".format(bsa)} m².\nVO2: ${"%.2f".format(vo2)} mL/min."
+                )
+                navController.popBackStack()
+            } else {
+                Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT)
+                    .show()
+            }
+
 
         }) {
             Text("Calcular y volver")
@@ -117,5 +151,6 @@ fun OxygenConsump(navController: NavController,
 
     }
 }
-enum class Gender { MALE, FEMALE }
+
+//enum class Gender { MALE, FEMALE }
 

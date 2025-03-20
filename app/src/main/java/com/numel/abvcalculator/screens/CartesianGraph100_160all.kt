@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.rotate
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.numel.abvcalculator.ui.theme.Pink80
 import com.numel.abvcalculator.ui.theme.verde
 import kotlin.math.log10
 import kotlin.math.pow
@@ -260,7 +261,7 @@ fun CartesianGraph100_160all(
             drawPoints(
                 points = listOf(Offset(xPosition, yPosition)),
                 pointMode = PointMode.Points,
-                color = Color.Red,
+                color = Pink80,
                 strokeWidth = 20f
             )
         }

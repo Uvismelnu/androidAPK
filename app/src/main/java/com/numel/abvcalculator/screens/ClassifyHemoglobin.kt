@@ -1,5 +1,6 @@
 package com.numel.abvcalculator.screens
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,21 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.numel.abvcalculator.data.classifyHemoglobin
 import com.numel.abvcalculator.navigation.ScreenData
 import com.numel.abvcalculator.navigation.ScreenData1
 import com.numel.abvcalculator.viewModel.MainViewModel
-import com.numel.abvcalculator.data.classifyHemoglobin
 
 @Composable
 fun ClassifyHemoglobin(
@@ -46,8 +47,9 @@ fun ClassifyHemoglobin(
     screenData1: ScreenData1,
     viewModel: MainViewModel
 ) {
-    var txHb by rememberSaveable { mutableStateOf("") }
+    var txHb by remember { mutableStateOf(viewModel.sharedHb.value) }
     val maxLength = 6
+    val context = LocalContext.current // Obtiene el contexto actual
 
     Column(
         modifier = Modifier
@@ -86,6 +88,8 @@ fun ClassifyHemoglobin(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txHb = sanitizedValue
+                            viewModel.updateSharedHb(txHb)
+
                         }
                         val hbValue = sanitizedValue.toDoubleOrNull()
                         isHbError = hbValue == null || hbValue < 1.0 || hbValue > 25.0
@@ -129,9 +133,15 @@ fun ClassifyHemoglobin(
         }
         Button(
             onClick = {
-                viewModel.updateTxHb(classifyHemoglobin(txHb.toDouble())) // Update the ViewModel with the first TextField's value
+                val hbValue = txHb.toDoubleOrNull()
+                if (hbValue != null) {
+                viewModel.updateTxHb(classifyHemoglobin(hbValue)) // Update the ViewModel with the first TextField's value
 
                 navController.popBackStack()
+                }
+                else{
+                    Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT).show()
+                }
             },
             modifier = Modifier.padding(8.dp)
         ) {

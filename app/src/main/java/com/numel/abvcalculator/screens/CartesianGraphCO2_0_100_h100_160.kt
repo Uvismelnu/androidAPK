@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.rotate
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.numel.abvcalculator.ui.theme.Pink80
 import com.numel.abvcalculator.ui.theme.verde
 import kotlin.math.log10
 import kotlin.math.pow
@@ -43,6 +44,7 @@ fun CartesianGraphCO2_0_100_h100_160(
     pH: Float,
     co2Posicion: Float
 ) {
+
     val canvasDp = 300.dp
     val canvasPx = with(LocalDensity.current) { canvasDp.toPx() }
     val scaleFactor = canvasPx / maxDataValue
@@ -242,7 +244,7 @@ fun CartesianGraphCO2_0_100_h100_160(
             drawPoints(
                 points = listOf(Offset(xPosition, yPosition)),
                 pointMode = PointMode.Points,
-                color = Color.Red,
+                color = Pink80,
                 strokeWidth = 20f
             )
         }

@@ -16,8 +16,11 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.rotate
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.numel.abvcalculator.ui.theme.Pink40
+import com.numel.abvcalculator.ui.theme.Pink80
 import com.numel.abvcalculator.ui.theme.crema
 import com.numel.abvcalculator.ui.theme.marron
 import com.numel.abvcalculator.ui.theme.verde
@@ -363,7 +366,7 @@ fun CartesianGraph(
                 scaleY = 0.25f,
                 pivot = Offset(-20f * scaleFactor, (size.height - (-50f * scaleFactor)))
             ) {// Draw the scaled polygon
-                drawPath(alcalosismetabolica, Color.LightGray)
+                drawPath(alcalosismetabolica, Pink40)
                 // Calculate text position
                 val bounds = alcalosismetabolica.getBounds() // Get bounds of the scaled polygon
                 val textX = bounds.right + 10f // Adjust spacing as needed
@@ -374,7 +377,7 @@ fun CartesianGraph(
                     textX,
                     textY,
                     Paint().apply {
-                        color = android.graphics.Color.LTGRAY
+                        color = Pink40.toArgb()
                         textSize = 16f * scaleFactor // Adjust text size as needed
                     }
                 )
@@ -382,7 +385,7 @@ fun CartesianGraph(
             // Draw the path with custom colors
             drawPath(
                 path = alcalosismetabolica,
-                color = Color.LightGray, // Fill color
+                color = Pink40, // Fill color
                 style = androidx.compose.ui.graphics.drawscope.Fill
             )
             // You can also draw the edges of the polygon (optional)
@@ -1399,7 +1402,7 @@ fun CartesianGraph(
             drawPoints(
                 points = point,
                 pointMode = PointMode.Points, // Modo para dibujar puntos individuales
-                color = Color.Red,
+                color = Pink80,
                 strokeWidth = 20f // Grosor de los puntos
             )
 

@@ -1,5 +1,6 @@
 package com.numel.abvcalculator.screens
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,11 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -48,19 +49,18 @@ fun CirculationMetabolism(
     screenData1: ScreenData1,
     viewModel: MainViewModel
 ) {
-    var txPO2arterial by rememberSaveable { mutableStateOf("") }
-    var txCO2venoso by rememberSaveable { mutableStateOf("") }
-    var txCO2arterial by rememberSaveable { mutableStateOf("") }
-    var txSaO2 by rememberSaveable { mutableStateOf("") }
-    var txSvO2 by rememberSaveable { mutableStateOf("") }
-    var txHb by rememberSaveable { mutableStateOf("") }
+    var txPO2arterial by remember { mutableStateOf(viewModel.sharedPO2a.value) }
+    var txCO2venoso by remember { mutableStateOf(viewModel.sharedCO2v.value) }
+    var txCO2arterial by remember { mutableStateOf(viewModel.sharedCO2a.value) }
+    var txSaO2 by remember { mutableStateOf(viewModel.sharedSO2a.value) }
+    var txSvO2 by remember { mutableStateOf(viewModel.sharedSO2v.value) }
+    var txHb by remember { mutableStateOf(viewModel.sharedHb.value) }
     val maxLength = 6
+    val context = LocalContext.current // Obtiene el contexto actual
 
     Column(
         modifier = Modifier
             .background(Color.Cyan)
-            //.weight(2F)
-
             .fillMaxSize()
             .padding(
                 horizontal = 2.dp, vertical = 2.dp
@@ -96,6 +96,8 @@ fun CirculationMetabolism(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txPO2arterial = sanitizedValue
+                            viewModel.updateSharedPO2a(txPO2arterial)
+
                         }
                         val pO2arterialValue = sanitizedValue.toDoubleOrNull()
                         isPO2arterialError =
@@ -155,6 +157,8 @@ fun CirculationMetabolism(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txCO2arterial = sanitizedValue
+                            viewModel.updateSharedCO2a(txCO2arterial)
+
                         }
                         val co2ArterialValue = sanitizedValue.toDoubleOrNull()
                         isCO2arterialError =
@@ -222,6 +226,7 @@ fun CirculationMetabolism(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txSaO2 = sanitizedValue
+                            viewModel.updateSharedSO2a(txSaO2)
                         }
                         val sao2Value = sanitizedValue.toDoubleOrNull()
                         isSaO2Error = sao2Value == null || sao2Value < 10 || sao2Value > 100.0
@@ -279,6 +284,8 @@ fun CirculationMetabolism(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txCO2venoso = sanitizedValue
+                            viewModel.updateSharedCO2v(txCO2venoso)
+
                         }
                         val co2VenosoValue = sanitizedValue.toDoubleOrNull()
                         isCO2venosoError =
@@ -346,6 +353,7 @@ fun CirculationMetabolism(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txSvO2 = sanitizedValue
+                            viewModel.updateSharedSO2v(txSvO2)
                         }
                         val svO2Value = sanitizedValue.toDoubleOrNull()
                         isSvO2Error = svO2Value == null || svO2Value < 10.0 || svO2Value > 100.0
@@ -408,6 +416,8 @@ fun CirculationMetabolism(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txHb = sanitizedValue
+                            viewModel.updateSharedHb(txHb)
+
                         }
                         val hbValue = sanitizedValue.toDoubleOrNull()
                         isHbError = hbValue == null || hbValue < 1.0 || hbValue > 25.0
@@ -451,9 +461,29 @@ fun CirculationMetabolism(
         }
         Button(
             onClick = {
-                viewModel.updateCirMetab(circulationMetabolism(txPO2arterial.toDouble(),txCO2arterial.toDouble(),txCO2venoso.toDouble(),txHb.toDouble(),txSaO2.toDouble(),txSvO2.toDouble())) // Update the ViewModel with the first TextField's value
+                val pO2arterialValue = txPO2arterial.toDoubleOrNull()
+                val co2ArterialValue = txCO2arterial.toDoubleOrNull()
+                val co2VenosoValue = txCO2venoso.toDoubleOrNull()
+                val hbValue = txHb.toDoubleOrNull()
+                val sao2Value = txSaO2.toDoubleOrNull()
+                val svO2Value = txSvO2.toDoubleOrNull()
+                if (pO2arterialValue != null && co2ArterialValue != null && co2VenosoValue != null && hbValue != null && sao2Value != null && svO2Value != null) {
+                    viewModel.updateCirMetab(
+                        circulationMetabolism(
+                            pO2arterialValue,
+                            co2ArterialValue,
+                            co2VenosoValue,
+                            hbValue,
+                            sao2Value,
+                            svO2Value
+                        )
+                    ) // Update the ViewModel with the first TextField's value
 
-                navController.popBackStack()
+                    navController.popBackStack()
+                }
+                else{
+                    Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT).show()
+                }
             },
             modifier = Modifier.padding(8.dp)
         ) {

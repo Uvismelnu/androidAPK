@@ -3,6 +3,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
@@ -11,6 +13,103 @@ class MainViewModel : ViewModel() {
     var isScreenCO2100_160_H_0_100Visible by mutableStateOf(false)
     var isScreenCO2100_160_H_100_160Visible by mutableStateOf(false)
     var isScreenCO2_0_100_h100_160Visible by mutableStateOf(false)
+
+    private val _selectedGender = mutableStateOf<Gender?>(null) // Inicialmente nulo
+    val selectedGender: State<Gender?> = _selectedGender
+
+    fun updateSelectedGender(newGender: Gender) {
+        _selectedGender.value = newGender
+    }
+
+
+    private val _sharedPHa = mutableStateOf("")
+    val sharedPHa: State<String> = _sharedPHa
+    fun updateSharedPHa(newText: String) {
+        _sharedPHa.value = newText
+    }
+    private val _sharedSO2a = mutableStateOf("")
+    val sharedSO2a: State<String> = _sharedSO2a
+    fun updateSharedSO2a(newText: String) {
+        _sharedSO2a.value = newText
+    }
+    private val _sharedSO2v = mutableStateOf("")
+    val sharedSO2v: State<String> = _sharedSO2v
+    fun updateSharedSO2v(newText: String) {
+        _sharedSO2v.value = newText
+    }
+    private val _sharedWeight = mutableStateOf("")
+    val sharedWeight: State<String> = _sharedWeight
+    fun updateSharedWeight(newText: String) {
+        _sharedWeight.value = newText
+    }
+    private val _sharedHeight = mutableStateOf("")
+    val sharedHeight: State<String> = _sharedHeight
+    fun updateSharedHeight(newText: String) {
+        _sharedHeight.value = newText
+    }
+    private val _sharedAge = mutableStateOf("")
+    val sharedAge: State<String> = _sharedAge
+    fun updateSharedAge(newText: String) {
+        _sharedAge.value = newText
+    }
+    private val _sharedHeartRate = mutableStateOf("")
+    val sharedHeartRate: State<String> = _sharedHeartRate
+    fun updateSharedHeartRate(newText: String) {
+        _sharedHeartRate.value = newText
+    }
+    private val _sharedVO2 = mutableStateOf("")
+    val sharedVO2: State<String> = _sharedVO2
+    fun updateSharedVO2(newText: String) {
+        _sharedVO2.value = newText
+    }
+    private val _sharedBSA = mutableStateOf("")
+    val sharedBSA: State<String> = _sharedBSA
+    fun updateSharedBSA(newText: String) {
+        _sharedBSA.value = newText
+    }
+
+
+    private val _sharedHCO3 = mutableStateOf("")
+    val sharedHCO3: State<String> = _sharedHCO3
+    fun updateSharedHCO3(newText: String) {
+            _sharedHCO3.value = newText
+    }
+    private val _sharedCO2a = mutableStateOf("")
+    val sharedCO2a: State<String> = _sharedCO2a
+    fun updateSharedCO2a(newText: String) {
+        _sharedCO2a.value = newText
+    }
+    private val _sharedNa = mutableStateOf("")
+    val sharedNa: State<String> = _sharedNa
+    fun updateSharedNa(newText: String) {
+        _sharedNa.value = newText
+    }
+    private val _sharedK = mutableStateOf("")
+    val sharedK: State<String> = _sharedK
+    fun updateSharedK(newText: String) {
+        _sharedK.value = newText
+    }
+    private val _sharedCl = mutableStateOf("")
+    val sharedCl: State<String> = _sharedCl
+    fun updateSharedCl(newText: String) {
+        _sharedCl.value = newText
+    }
+    private val _sharedPO2a = mutableStateOf("")
+    val sharedPO2a: State<String> = _sharedPO2a
+    fun updateSharedPO2a(newText: String) {
+        _sharedPO2a.value = newText
+    }
+    private val _sharedHb = mutableStateOf("")
+    val sharedHb: State<String> = _sharedHb
+    fun updateSharedHb(newText: String) {
+        _sharedHb.value = newText
+    }
+    private val _sharedCO2v = mutableStateOf("")
+    val sharedCO2v: State<String> = _sharedCO2v
+    fun updateSharedCO2v(newText: String) {
+        _sharedCO2v.value = newText
+    }
+
 
 
 
@@ -124,3 +223,4 @@ class MainViewModel : ViewModel() {
 
     }
 }
+enum class Gender { MALE, FEMALE }

@@ -1,5 +1,6 @@
 package com.numel.abvcalculator.screens
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,11 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -46,7 +47,8 @@ fun Bicarbonate(
     screenData1: ScreenData1,
     viewModel: MainViewModel
 ) {
-    var txHCO3 by rememberSaveable { mutableStateOf("") }
+    var txHCO3 by remember { mutableStateOf(viewModel.sharedHCO3.value) }
+    val context = LocalContext.current // Obtiene el contexto actual
 
     val maxLength = 6
 
@@ -89,6 +91,7 @@ fun Bicarbonate(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txHCO3 = sanitizedValue
+                            viewModel.updateSharedHCO3(txHCO3)
                         }
                         val hco3Value = sanitizedValue.toDoubleOrNull()
                         isHCO3Error = hco3Value == null || hco3Value < 1.0 || hco3Value > 50.0
@@ -130,9 +133,18 @@ fun Bicarbonate(
         }
         Button(
             onClick = {
-                viewModel.updateTxHCO3(classifyBicarbonate(txHCO3.toDouble())) // Update the ViewModel with the first TextField's value
+                val bicar = txHCO3.toDoubleOrNull()
+                if (bicar != null) {
+                    viewModel.updateTxHCO3(classifyBicarbonate(bicar))
+                    navController.popBackStack()
 
-                navController.popBackStack()
+                }
+                else{
+                    Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT).show()
+                }
+
+
+
             },
             modifier = Modifier.padding(8.dp)
         ) {

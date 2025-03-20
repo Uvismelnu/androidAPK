@@ -1,5 +1,6 @@
 package com.numel.abvcalculator.screens
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
@@ -22,11 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -45,8 +46,9 @@ fun ClassifyPaCO2(
     screenData1: ScreenData1,
     viewModel: MainViewModel
 ) {
-    var txCO2arterial by rememberSaveable { mutableStateOf("") }
+    var txCO2arterial by remember { mutableStateOf(viewModel.sharedCO2a.value) }
     val maxLength = 6
+    val context = LocalContext.current // Obtiene el contexto actual
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,6 +83,7 @@ fun ClassifyPaCO2(
                         val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
                         if (newValue.length <= maxLength) {
                             txCO2arterial = sanitizedValue
+                            viewModel.updateSharedCO2a(txCO2arterial)
                         }
                         val co2ArterialValue = sanitizedValue.toDoubleOrNull()
                         isCO2arterialError =
@@ -129,9 +132,15 @@ fun ClassifyPaCO2(
         }
         Button(
             onClick = {
-                viewModel.updateTxCO2arterial(classifyPaCO2(txCO2arterial.toDouble())) // Update the ViewModel with the first TextField's value
+                val po2Value = txCO2arterial.toDoubleOrNull()
+                if (po2Value != null) {
+                    viewModel.updateTxCO2arterial(classifyPaCO2(po2Value)) // Update the ViewModel with the first TextField's value
 
-                navController.popBackStack()
+                    navController.popBackStack()
+                }
+                else{
+                    Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT).show()
+                }
             },
             modifier = Modifier.padding(8.dp)
         ) {
