@@ -120,96 +120,70 @@ fun MainScreen(
                     CartesianGraghCO2100_160_H0_100(
                         modifier = Modifier.size(canvasDp),
                         labelInterval = 10f,
-                        lineStart = Pair(100f, 61.10f),
-                        lineEnd = Pair(160f, 97.76f),
-                        lineStart1 = Pair(100f, 56.70f),
-                        lineEnd1 = Pair(160f, 90.72f),
-                        lineStart2 = Pair(100f, 53.00f),
-                        lineEnd2 = Pair(160f, 84.80f),
-                        lineStart3 = Pair(100f, 49.70f),
-                        lineEnd3 = Pair(160f, 79.52f),
-                        lineStart4 = Pair(100f, 46.70f),
-                        lineEnd4 = Pair(160f, 74.72f),
-                        lineStart5 = Pair(100f, 44.10f),
-                        lineEnd5 = Pair(160f, 70.56f),
-                        lineStart6 = Pair(100f, 41.80f),
-                        lineEnd6 = Pair(160f, 66.88f),
-                        lineStart7 = Pair(100f, 39.70f),
-                        lineEnd7 = Pair(160f, 63.52f),
-                        lineStart8 = Pair(100f, 37.80f),
-                        lineEnd8 = Pair(160f, 60.48f),
-                        lineStart9 = Pair(100f, 36.10f),
-                        lineEnd9 = Pair(160f, 57.76f),
-                        lineStart10 = Pair(100f, 34.50f),
-                        lineEnd10 = Pair(160f, 55.20f),
-                        lineStart11 = Pair(100f, 33.10f),
-                        lineEnd11 = Pair(160f, 52.96f),
-                        lineStart12 = Pair(100f, 31.80f),
-                        lineEnd12 = Pair(160f, 50.88f),
-                        lineStart13 = Pair(100f, 99.30f),
-                        lineEnd13 = Pair(100.70f, 100f),
-                        lineStart14 = Pair(100f, 88.30f),
-                        lineEnd14 = Pair(113.23f, 100f),
-                        lineStart15 = Pair(100f, 79.40f),
-                        lineEnd15 = Pair(125.94f, 100f),
-                        lineStart16 = Pair(100f, 72.20f),
-                        lineEnd16 = Pair(138.50f, 100f),
-                        lineStart17 = Pair(100f, 66.20f),
-                        lineEnd17 = Pair(151.05f, 100f),
-                        phsize = phsize,
-                        pH = pH,
-                        co2Posicion = co2
+                        // MISMOS PARES QUE TENÍAS COMO lineStart..lineEnd
+                        lines = listOf(
+                            Pair(Pair(100f, 61.10f), Pair(160f, 97.76f)),
+                            Pair(Pair(100f, 56.70f), Pair(160f, 90.72f)),
+                            Pair(Pair(100f, 53.00f), Pair(160f, 84.80f)),
+                            Pair(Pair(100f, 49.70f), Pair(160f, 79.52f)),
+                            Pair(Pair(100f, 46.70f), Pair(160f, 74.72f)),
+                            Pair(Pair(100f, 44.10f), Pair(160f, 70.56f)),
+                            Pair(Pair(100f, 41.80f), Pair(160f, 66.88f)),
+                            Pair(Pair(100f, 39.70f), Pair(160f, 63.52f)),
+                            Pair(Pair(100f, 37.80f), Pair(160f, 60.48f)),
+                            Pair(Pair(100f, 36.10f), Pair(160f, 57.76f)),
+                            Pair(Pair(100f, 34.50f), Pair(160f, 55.20f)),
+                            Pair(Pair(100f, 33.10f), Pair(160f, 52.96f)),
+                            Pair(Pair(100f, 31.80f), Pair(160f, 50.88f)),
+                            Pair(Pair(100f, 99.30f), Pair(100.70f, 100f)),
+                            Pair(Pair(100f, 88.30f), Pair(113.23f, 100f)),
+                            Pair(Pair(100f, 79.40f), Pair(125.94f, 100f)),
+                            Pair(Pair(100f, 72.20f), Pair(138.50f, 100f)),
+                            Pair(Pair(100f, 66.20f), Pair(151.05f, 100f))
+                        ),
+                        currentPH = pH,
+                        currentCO2 = co2,
+                        phAxisLabelFontSize = 14.dp
                     )
                 }
                 viewModel.isScreenCO2100_160_H_100_160Visible -> {
                     CartesianGraph100_160all(
                         modifier = Modifier.size(canvasDp),
-                        maxDataValue = maximoValor,
                         labelInterval = 10f,
-                        lineStart = Pair(100f, 158.90f),
-                        lineEnd = Pair(100.70f, 160f),
-                        lineStart1 = Pair(100f, 132.40f),
-                        lineEnd1 = Pair(120.86f, 160f),
-                        lineStart2 = Pair(100f, 113.50f),
-                        lineEnd2 = Pair(140.96f, 160f),
-                        lineStart3 = Pair(100.70f, 100f),
-                        lineEnd3 = Pair(160f, 158.88f),
-                        lineStart4 = Pair(113.23f, 100f),
-                        lineEnd4 = Pair(160f, 141.28f),
-                        lineStart5 = Pair(125.94f, 100f),
-                        lineEnd5 = Pair(160f, 127.04f),
-                        lineStart6 = Pair(138.50f, 100f),
-                        lineEnd6 = Pair(160f, 115.52f),
-                        lineStart7 = Pair(151.05f, 100f),
-                        lineEnd7 = Pair(160f, 105.92f),
-                        phsize = phsize,
-                        pH = pH,
-                        co2Posicion = co2
+                        lines = listOf(
+                            Pair(Pair(100f, 158.90f), Pair(100.70f, 160f)),
+                            Pair(Pair(100f, 132.40f), Pair(120.86f, 160f)),
+                            Pair(Pair(100f, 113.50f), Pair(140.96f, 160f)),
+                            Pair(Pair(100.70f, 100f), Pair(160f, 158.88f)),
+                            Pair(Pair(113.23f, 100f), Pair(160f, 141.28f)),
+                            Pair(Pair(125.94f, 100f), Pair(160f, 127.04f)),
+                            Pair(Pair(138.50f, 100f), Pair(160f, 115.52f)),
+                            Pair(Pair(151.05f, 100f), Pair(160f, 105.92f))
+                        ),
+                        currentPH = pH,
+                        currentCO2 = co2,
+                        phAxisLabelFontSize = 14.dp
                     )
                 }
                 viewModel.isScreenCO2_0_100_h100_160Visible -> {
                     CartesianGraphCO2_0_100_h100_160(
                         modifier = Modifier.size(canvasDp),
-                        maxDataValue = maximoValor,
                         labelInterval = 10f,
-                        lineStart = Pair(25.1780f, 100f),
-                        lineEnd = Pair(40.2925f, 160f),
-                        lineStart1 = Pair(37.7512f, 100f),
-                        lineEnd1 = Pair(60.41f, 160f),
-                        lineStart2 = Pair(50.3335f, 100f),
-                        lineEnd2 = Pair(80.54f, 160f),
-                        lineStart3 = Pair(62.9445f, 100f),
-                        lineEnd3 = Pair(100f, 158.8775f),
-                        lineStart4 = Pair(75.5442f, 100f),
-                        lineEnd4 = Pair(100f, 132.3772f),
-                        lineStart5 = Pair(88.1162f, 100f),
-                        lineEnd5 = Pair(100f, 113.4869f),
-                        phsize = phsize,
-                        pH = pH,
-                        co2Posicion = co2
+                        lines = listOf(
+                            Pair(Pair(25.1780f, 100f), Pair(40.2925f, 160f)),
+                            Pair(Pair(37.7512f, 100f), Pair(60.41f, 160f)),
+                            Pair(Pair(50.3335f, 100f), Pair(80.54f, 160f)),
+                            Pair(Pair(62.9445f, 100f), Pair(100f, 158.8775f)),
+                            Pair(Pair(75.5442f, 100f), Pair(100f, 132.3772f)),
+                            Pair(Pair(88.1162f, 100f), Pair(100f, 113.4869f))
+                        ),
+                        currentPH = pH,
+                        currentCO2 = co2,
+                        phAxisLabelFontSize = 14.dp
                     )
                 }
             }
+
         }
 
         Spacer(modifier = Modifier.height(20.dp))
