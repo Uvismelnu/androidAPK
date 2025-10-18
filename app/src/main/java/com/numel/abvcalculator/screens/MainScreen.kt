@@ -1,4 +1,5 @@
 package com.numel.abvcalculator.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,11 +62,11 @@ fun MainScreen(
     ) {
         // Configuración de gráficos
         val maximoValor by remember { mutableFloatStateOf(100f) }
-        // val phPosicion by remember { mutableFloatStateOf(105f) } // Ya no es necesario
-        val phLabelFontSizeDp = 14.dp // CORRECCIÓN AQUÍ
+
+        val phLabelFontSizeDp = 14.dp
         val canvasDp = 300.dp
-        val currentPhValue = viewModel.txPharterial.value.toFloatOrNull() ?: 7.2f // Renombrado para claridad
-        val currentCo2Value = viewModel.txCO2arterial.value.toFloatOrNull() ?: 20f // Renombrado para claridad
+        val currentPhValue = viewModel.txPharterial.value.toFloatOrNull() ?: 7.2f
+        val currentCo2Value = viewModel.txCO2arterial.value.toFloatOrNull() ?: 20f
 
         val phsize by remember { mutableFloatStateOf(34f) }
 
@@ -105,11 +106,10 @@ fun MainScreen(
                     Pair(Pair(17.88968f, 5.920951f), Pair(100f, 33.097f)),
                     Pair(Pair(18.07213f, 5.742082f), Pair(100f, 31.773129f))
                 ),
-                phAxisLabelFontSize = phLabelFontSizeDp, // Nombre de parámetro corregido y valor Dp
-                currentPH = currentPhValue,             // Nombre de parámetro corregido
-                currentCO2 = currentCo2Value            // Nombre de parámetro corregido
+                phAxisLabelFontSize = phLabelFontSizeDp,
+                currentPH = currentPhValue,
+                currentCO2 = currentCo2Value
             )
-
         }
 
         // Mostrar otros gráficos según su visibilidad
@@ -120,7 +120,6 @@ fun MainScreen(
                     CartesianGraghCO2100_160_H0_100(
                         modifier = Modifier.size(canvasDp),
                         labelInterval = 10f,
-                        // MISMOS PARES QUE TENÍAS COMO lineStart..lineEnd
                         lines = listOf(
                             Pair(Pair(100f, 61.10f), Pair(160f, 97.76f)),
                             Pair(Pair(100f, 56.70f), Pair(160f, 90.72f)),
@@ -143,7 +142,27 @@ fun MainScreen(
                         ),
                         currentPH = pH,
                         currentCO2 = co2,
-                        phAxisLabelFontSize = 14.dp
+                        phAxisLabelFontSize = 14.dp,
+                        referenceLabels = listOf(
+                            ReferenceLabelInfo("21", 155f, 155.30f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("24", 155f, 154.56f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("27", 155f, 152.89f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("30", 155f, 150.51f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("33", 155f, 147.62f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("36", 155f, 144.41f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("39", 155f, 141.00f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("42", 155f, 137.47f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("45", 155f, 133.86f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("48", 155f, 130.21f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("51", 155f, 126.55f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("54", 155f, 122.91f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("57", 155f, 119.32f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("60", 155f, 115.78f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("63", 155f, 112.31f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("66", 155f, 108.92f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("69", 155f, 105.62f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("72", 155f, 102.40f, 9.dp, android.graphics.Color.BLACK)
+                        )
                     )
                 }
                 viewModel.isScreenCO2100_160_H_100_160Visible -> {
@@ -162,7 +181,17 @@ fun MainScreen(
                         ),
                         currentPH = pH,
                         currentCO2 = co2,
-                        phAxisLabelFontSize = 14.dp
+                        phAxisLabelFontSize = 14.dp,
+                        referenceLabels = listOf(
+                            ReferenceLabelInfo("15", 97.55f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("18", 117.03f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("21", 136.63f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("24", 155f, 154.10f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("27", 155f, 136.79f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("30", 155f, 123.01f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("33", 155.0f, 111.80f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("36", 155.0f, 102.73f, 9.dp, android.graphics.Color.BLACK)
+                        )
                     )
                 }
                 viewModel.isScreenCO2_0_100_h100_160Visible -> {
@@ -179,11 +208,19 @@ fun MainScreen(
                         ),
                         currentPH = pH,
                         currentCO2 = co2,
-                        phAxisLabelFontSize = 14.dp
+                        phAxisLabelFontSize = 14.dp,
+                        referenceLabels = listOf(
+                            ReferenceLabelInfo("6", 39.02669f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("9", 58.54f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("12", 78.05f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("15", 97.55f, 155f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("18", 95f, 150.92f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("21", 95f, 125.7686f, 9.dp, android.graphics.Color.BLACK),
+                            ReferenceLabelInfo("24", 95f, 107.8f, 9.dp, android.graphics.Color.BLACK)
+                        )
                     )
                 }
             }
-
         }
 
         Spacer(modifier = Modifier.height(20.dp))

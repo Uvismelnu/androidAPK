@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
-// import androidx.compose.ui.graphics.StrokeCap // Descomentar si se usa para drawPoints
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.numel.abvcalculator.ui.theme.* // Asegúrate de que estos colores estén definidos
+import com.numel.abvcalculator.ui.theme.*
 import kotlin.math.log10
 import kotlin.math.pow
 import androidx.compose.animation.core.LinearEasing
@@ -31,14 +31,11 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.getValue
 
-
-// Define tus colores si no están ya en ui.theme (Ejemplos)
-val crema = Color(0xFFF0E68C) // Ejemplo de color crema
-val marron = Color(0xFFA52A2A) // Ejemplo de color marrón
-val verde = Color(0xFF228B22)  // Ejemplo de color verde (ForestGreen)
-// Pink40 y Pink80 deberían estar en tus theme colors (Material 3)
+// Define tus colores si no están ya en ui.theme
+val crema = Color(0xFFF0E68C)
+val marron = Color(0xFFA52A2A)
+val verde = Color(0xFF228B22)
 
 // Data class para las etiquetas de referencia
 data class ReferenceLabelInfo(
@@ -50,22 +47,26 @@ data class ReferenceLabelInfo(
     val typeface: Typeface? = null
 )
 
+// Extensión para facilitar la conversión de Dp a Px
+fun Dp.toPx(density: Density): Float = with(density) { this@toPx.toPx() }
+
 @Composable
 fun CartesianGraphScreen(
-    modifier: Modifier = Modifier.fillMaxWidth().height(400.dp),
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(400.dp),
     maxDataValue: Float = 100f,
     labelInterval: Float = 10f,
     lines: List<Pair<Pair<Float, Float>, Pair<Float, Float>>> = emptyList(),
     phAxisLabelFontSize: Dp = 14.dp,
-    currentPH: Float = 7.4f, // Valor de pH para el punto a dibujar
-    currentCO2: Float = 40f  // Valor de CO2 para el punto a dibujar
+    currentPH: Float = 7.4f,
+    currentCO2: Float = 40f
 ) {
     val localDensity = LocalDensity.current
 
-
-// --- Blink: de 1.0 a 0.2 y vuelve, ~700 ms ---
-    val infinite = rememberInfiniteTransition(label = "blink")
-    val blinkAlpha by infinite.animateFloat(
+    // Blink animation
+    val infiniteTransition = rememberInfiniteTransition(label = "blink")
+    val blinkAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 0.2f,
         animationSpec = infiniteRepeatable(
@@ -74,7 +75,6 @@ fun CartesianGraphScreen(
         ),
         label = "blinkAlpha"
     )
-
 
     Column {
         Canvas(modifier = modifier) {
@@ -119,7 +119,11 @@ fun CartesianGraphScreen(
                 close()
             }
             drawPath(acidosisMetabolicaPath, Color.LightGray, style = Fill)
-            drawPath(acidosisMetabolicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                acidosisMetabolicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Acid. Metab.",
                 dataToCanvasX(18f),
@@ -137,7 +141,11 @@ fun CartesianGraphScreen(
                 close()
             }
             drawPath(acidRespAgudaPath, crema, style = Fill)
-            drawPath(acidRespAgudaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                acidRespAgudaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Acid. Resp. Aguda",
                 dataToCanvasX(70f),
@@ -154,7 +162,11 @@ fun CartesianGraphScreen(
                 close()
             }
             drawPath(acidRespCronicaPath, marron, style = Fill)
-            drawPath(acidRespCronicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                acidRespCronicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Acid. Resp. Crón.",
                 dataToCanvasX(70f),
@@ -175,7 +187,11 @@ fun CartesianGraphScreen(
                 close()
             }
             drawPath(alcalosisMetabolicaPath, Pink40, style = Fill)
-            drawPath(alcalosisMetabolicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                alcalosisMetabolicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Alc. Metab.",
                 dataToCanvasX(48f),
@@ -192,7 +208,11 @@ fun CartesianGraphScreen(
                 close()
             }
             drawPath(alcalosisRespAgudaPath, Color.Blue.copy(alpha = 0.7f), style = Fill)
-            drawPath(alcalosisRespAgudaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                alcalosisRespAgudaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Alc. Resp. Aguda",
                 dataToCanvasX(22f),
@@ -204,11 +224,15 @@ fun CartesianGraphScreen(
             val alcalosisRespCronicaPath = Path().apply {
                 moveTo(dataToCanvasX(35f), dataToCanvasY(40.86956f))
                 lineTo(dataToCanvasX(11.064002f), dataToCanvasY(27.2463f))
-                lineTo(dataToCanvasX(11.415068f), dataToCanvasY(37.855072f)) // Ajuste para cerrar el triángulo
+                lineTo(dataToCanvasX(11.415068f), dataToCanvasY(37.855072f))
                 close()
             }
             drawPath(alcalosisRespCronicaPath, Color.Magenta.copy(alpha = 0.7f), style = Fill)
-            drawPath(alcalosisRespCronicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                alcalosisRespCronicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Alc. Resp. Crón.",
                 dataToCanvasX(20f),
@@ -225,21 +249,23 @@ fun CartesianGraphScreen(
                 close()
             }
             drawPath(normalPath, Color.Red.copy(alpha = 0.8f), style = Fill)
-            drawPath(normalPath, Color.Black, style = Stroke(width = 1.dp.toPx(localDensity))) // Borde más grueso para "Normal"
+            drawPath(normalPath, Color.Black, style = Stroke(width = 1.dp.toPx(localDensity)))
             drawContext.canvas.nativeCanvas.drawText(
                 "Normal",
-                dataToCanvasX(40f), // Centro del cuadrado
-                dataToCanvasY(40f), // Centro del cuadrado
+                dataToCanvasX(40f),
+                dataToCanvasY(40f),
                 polygonLabelPaint.apply {
                     color = android.graphics.Color.WHITE
-                    textSize = 10.dp.toPx(localDensity) // Un poco más pequeño para "Normal"
+                    textSize = 10.dp.toPx(localDensity)
                 }
             )
 
-            // ========== LÍNEAS VERDES (de la lista "lines") ============
+            // ========== LÍNEAS VERDES CON ETIQUETAS ============
             lines.forEach { line ->
-                val start = Offset(dataToCanvasX(line.first.first), dataToCanvasY(line.first.second))
-                val end = Offset(dataToCanvasX(line.second.first), dataToCanvasY(line.second.second))
+                val start =
+                    Offset(dataToCanvasX(line.first.first), dataToCanvasY(line.first.second))
+                val end =
+                    Offset(dataToCanvasX(line.second.first), dataToCanvasY(line.second.second))
                 drawLine(
                     color = verde,
                     start = start,
@@ -260,7 +286,7 @@ fun CartesianGraphScreen(
                 for (i in 0..numGridLinesX) {
                     val xData = i * labelInterval
                     val xCanvas = dataToCanvasX(xData)
-                    drawLine( // Líneas verticales
+                    drawLine(
                         color = Color.LightGray.copy(alpha = 0.5f),
                         start = Offset(xCanvas, 0f),
                         end = Offset(xCanvas, actualCanvasHeight),
@@ -280,7 +306,7 @@ fun CartesianGraphScreen(
                 for (i in 0..numGridLinesY) {
                     val yData = i * labelInterval
                     val yCanvas = dataToCanvasY(yData)
-                    drawLine( // Líneas horizontales
+                    drawLine(
                         color = Color.LightGray.copy(alpha = 0.5f),
                         start = Offset(0f, yCanvas),
                         end = Offset(actualCanvasWidth, yCanvas),
@@ -297,8 +323,8 @@ fun CartesianGraphScreen(
                 }
                 drawContext.canvas.nativeCanvas.drawText(
                     "0",
-                    -10.dp.toPx(localDensity), // Origen X
-                    actualCanvasHeight + 12.dp.toPx(localDensity), // Origen Y
+                    -10.dp.toPx(localDensity),
+                    actualCanvasHeight + 12.dp.toPx(localDensity),
                     gridLabelPaint.apply { textAlign = Paint.Align.RIGHT }
                 )
             }
@@ -313,31 +339,27 @@ fun CartesianGraphScreen(
             }
 
             // Bicarbonato (HCO3)
-            // 1) Ángulo de la recta pA→pB en coordenadas de lienzo
-            val pA = Offset(dataToCanvasX(4.73744f),  dataToCanvasY(18.815413f))
+            val pA = Offset(dataToCanvasX(4.73744f), dataToCanvasY(18.815413f))
             val pB = Offset(dataToCanvasX(18.07213f), dataToCanvasY(5.742082f))
             val angleRad = kotlin.math.atan2(pB.y - pA.y, pB.x - pA.x)
             val angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
 
-            // 2) Punto donde debe empezar la 1ª letra: (3,18)
             val anchorX = dataToCanvasX(3f)
             val anchorY = dataToCanvasY(18f)
 
-            // 3) (opcional) empujar un pelín “por debajo” de la recta
-            val nudgePerp = 4.dp.toPx(localDensity) // pon 0 para exacto; prueba 4.dp si quieres despegarlo
-            val nx = kotlin.math.cos(angleRad + Math.PI/2).toFloat()
-            val ny = kotlin.math.sin(angleRad + Math.PI/2).toFloat()
+            val nudgePerp = 4.dp.toPx(localDensity)
+            val nx = kotlin.math.cos(angleRad + Math.PI / 2).toFloat()
+            val ny = kotlin.math.sin(angleRad + Math.PI / 2).toFloat()
             val x = anchorX + nx * nudgePerp
             val y = anchorY + ny * nudgePerp
 
-            // 4) Pintura: alinear a la IZQUIERDA para que el (x,y) sea el inicio de la 1ª letra
-            val hco3Paint = android.graphics.Paint(axisLabelPaint).apply {
-                textAlign = android.graphics.Paint.Align.LEFT
+            val hco3Paint = Paint(axisLabelPaint).apply {
+                textAlign = Paint.Align.LEFT
             }
 
             drawIntoCanvas { canvas ->
                 canvas.nativeCanvas.save()
-                canvas.nativeCanvas.rotate(angleDeg, x, y)   // paralelo a pA→pB
+                canvas.nativeCanvas.rotate(angleDeg, x, y)
                 canvas.nativeCanvas.drawText("HCO₃⁻ (mEq/L)", x, y, hco3Paint)
                 canvas.nativeCanvas.restore()
             }
@@ -360,7 +382,7 @@ fun CartesianGraphScreen(
                 canvas.nativeCanvas.drawText(
                     "pH",
                     0f,
-                    0f + axisLabelPaint.textSize / 3, // Centrar texto después de rotar
+                    0f + axisLabelPaint.textSize / 3,
                     axisLabelPaint.apply {
                         color = android.graphics.Color.MAGENTA
                         textSize = phAxisLabelFontSize.toPx(localDensity)
@@ -380,7 +402,7 @@ fun CartesianGraphScreen(
                 canvas.nativeCanvas.drawText(
                     "[H⁺] (nEq/L)",
                     0f,
-                    0f + axisLabelPaint.textSize / 3, // Centrar texto después de rotar
+                    0f + axisLabelPaint.textSize / 3,
                     axisLabelPaint.apply { textAlign = Paint.Align.CENTER }
                 )
                 canvas.nativeCanvas.restore()
@@ -413,10 +435,16 @@ fun CartesianGraphScreen(
                 ReferenceLabelInfo("60", 95f, 37.73059f, 9.dp, android.graphics.Color.BLACK),
                 ReferenceLabelInfo("63", 95f, 35.93389f, 9.dp, android.graphics.Color.BLACK),
                 ReferenceLabelInfo("66", 95f, 34.30054f, 9.dp, android.graphics.Color.BLACK),
-                ReferenceLabelInfo("75", 95f, 30.18447f, 7.dp, android.graphics.Color.WHITE, Typeface.create(Typeface.DEFAULT, Typeface.BOLD)),
+                ReferenceLabelInfo(
+                    "75",
+                    95f,
+                    30.18447f,
+                    7.dp,
+                    android.graphics.Color.WHITE,
+                    Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                ),
                 ReferenceLabelInfo("72", 95f, 31.44216f, 7.dp, android.graphics.Color.BLACK),
                 ReferenceLabelInfo("69", 95f, 32.80921f, 7.dp, android.graphics.Color.BLACK),
-                // ... Añade más aquí según sea necesario
             )
 
             labelData.forEach { labelInfo ->
@@ -463,8 +491,7 @@ fun CartesianGraphScreen(
                 }
             }
 
-            // ========== PUNTO DE DATOS (CO2 y pH) ==========
-            // ========== PUNTO DE DATOS (CO2 y pH) ==========
+            // ========== PUNTO DE DATOS CON EFECTO BLINK ==========
             if (currentPH > 0 && currentCO2 > 0) {
                 val hPlusData = 10.0.pow((9.0 - currentPH).toDouble())
                 val xDataPoint = currentCO2
@@ -477,38 +504,47 @@ fun CartesianGraphScreen(
                     drawPoints(
                         points = listOf(Offset(pointCanvasX, pointCanvasY)),
                         pointMode = PointMode.Points,
-                        color = Pink80.copy(alpha = blinkAlpha),           // <-- blink
+                        color = Pink80.copy(alpha = blinkAlpha),
                         strokeWidth = 6.dp.toPx(localDensity),
                     )
                     drawCircle(
-                        color = Pink80.copy(alpha = 0.5f * blinkAlpha),    // <-- blink
+                        color = Pink80.copy(alpha = 0.5f * blinkAlpha),
                         radius = 8.dp.toPx(localDensity),
                         center = Offset(pointCanvasX, pointCanvasY),
                         style = Stroke(width = 1.dp.toPx(localDensity))
                     )
                 }
             }
-
         }
-        Spacer(modifier = Modifier.height(30.dp)) // Espacio debajo del gráfico
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
-
-// Extensión para facilitar la conversión de Dp a Px dentro de DrawScope o Composable
-fun Dp.toPx(density: Density): Float = with(density) { this@toPx.toPx() }
 
 @Composable
 private fun CartesianGraphBase(
     modifier: Modifier,
-    maxX: Float,                       // rango eje X (pCO2)
-    maxY: Float,                       // rango eje Y ([H+])
+    maxX: Float,
+    maxY: Float,
     labelInterval: Float = 10f,
     lines: List<Pair<Pair<Float, Float>, Pair<Float, Float>>> = emptyList(),
     currentPH: Float,
     currentCO2: Float,
-    phAxisLabelFontSize: Dp = 14.dp
+    phAxisLabelFontSize: Dp = 14.dp,
+    referenceLabels: List<ReferenceLabelInfo> = emptyList()
 ) {
     val localDensity = LocalDensity.current
+
+    // Blink animation
+    val infiniteTransition = rememberInfiniteTransition(label = "blink")
+    val blinkAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 700, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "blinkAlpha"
+    )
 
     Column {
         Canvas(modifier = modifier) {
@@ -523,8 +559,18 @@ private fun CartesianGraphBase(
             fun dataToCanvasY(dataY: Float): Float = actualCanvasHeight - (dataY * scaleFactorY)
 
             // Ejes
-            drawLine(Color.Black, Offset(0f, actualCanvasHeight), Offset(actualCanvasWidth, actualCanvasHeight), 1.dp.toPx(localDensity))
-            drawLine(Color.Black, Offset(0f, 0f), Offset(0f, actualCanvasHeight), 1.dp.toPx(localDensity))
+            drawLine(
+                Color.Black,
+                Offset(0f, actualCanvasHeight),
+                Offset(actualCanvasWidth, actualCanvasHeight),
+                1.dp.toPx(localDensity)
+            )
+            drawLine(
+                Color.Black,
+                Offset(0f, 0f),
+                Offset(0f, actualCanvasHeight),
+                1.dp.toPx(localDensity)
+            )
 
             val polygonLabelPaint = Paint().apply {
                 isAntiAlias = true
@@ -532,7 +578,7 @@ private fun CartesianGraphBase(
                 textAlign = Paint.Align.CENTER
             }
 
-            // --- Polígonos (mismos del 0..100; en vistas 0..160 quedan en el cuadrante inferior-izq) ---
+            // --- Polígonos ---
             val acidosisMetabolicaPath = Path().apply {
                 moveTo(dataToCanvasX(17.96651f), dataToCanvasY(100f))
                 lineTo(dataToCanvasX(17.96111f), dataToCanvasY(81.04058f))
@@ -544,7 +590,11 @@ private fun CartesianGraphBase(
                 close()
             }
             drawPath(acidosisMetabolicaPath, Color.LightGray, style = Fill)
-            drawPath(acidosisMetabolicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                acidosisMetabolicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Acid. Metab.",
                 dataToCanvasX(18f), dataToCanvasY(70f),
@@ -560,7 +610,11 @@ private fun CartesianGraphBase(
                 close()
             }
             drawPath(acidRespAgudaPath, crema, style = Fill)
-            drawPath(acidRespAgudaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                acidRespAgudaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Acid. Resp. Aguda",
                 dataToCanvasX(70f), dataToCanvasY(65f),
@@ -575,7 +629,11 @@ private fun CartesianGraphBase(
                 close()
             }
             drawPath(acidRespCronicaPath, marron, style = Fill)
-            drawPath(acidRespCronicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                acidRespCronicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Acid. Resp. Crón.",
                 dataToCanvasX(70f), dataToCanvasY(50f),
@@ -594,7 +652,11 @@ private fun CartesianGraphBase(
                 close()
             }
             drawPath(alcalosisMetabolicaPath, Pink40, style = Fill)
-            drawPath(alcalosisMetabolicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                alcalosisMetabolicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Alc. Metab.",
                 dataToCanvasX(48f), dataToCanvasY(25f),
@@ -609,7 +671,11 @@ private fun CartesianGraphBase(
                 close()
             }
             drawPath(alcalosisRespAgudaPath, Color.Blue.copy(alpha = 0.7f), style = Fill)
-            drawPath(alcalosisRespAgudaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                alcalosisRespAgudaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Alc. Resp. Aguda",
                 dataToCanvasX(22f), dataToCanvasY(28f),
@@ -623,7 +689,11 @@ private fun CartesianGraphBase(
                 close()
             }
             drawPath(alcalosisRespCronicaPath, Color.Magenta.copy(alpha = 0.7f), style = Fill)
-            drawPath(alcalosisRespCronicaPath, Color.Black, style = Stroke(width = 0.5.dp.toPx(localDensity)))
+            drawPath(
+                alcalosisRespCronicaPath,
+                Color.Black,
+                style = Stroke(width = 0.5.dp.toPx(localDensity))
+            )
             drawContext.canvas.nativeCanvas.drawText(
                 "Alc. Resp. Crón.",
                 dataToCanvasX(20f), dataToCanvasY(36f),
@@ -643,13 +713,17 @@ private fun CartesianGraphBase(
             drawContext.canvas.nativeCanvas.drawText(
                 "Normal",
                 dataToCanvasX(40f), dataToCanvasY(40f),
-                polygonLabelPaint.apply { color = android.graphics.Color.WHITE; textSize = 10.dp.toPx(localDensity) }
+                polygonLabelPaint.apply {
+                    color = android.graphics.Color.WHITE; textSize = 10.dp.toPx(localDensity)
+                }
             )
 
-            // Líneas verdes
+            // ========== LÍNEAS VERDES ============
             lines.forEach { line ->
-                val start = Offset(dataToCanvasX(line.first.first), dataToCanvasY(line.first.second))
-                val end = Offset(dataToCanvasX(line.second.first), dataToCanvasY(line.second.second))
+                val start =
+                    Offset(dataToCanvasX(line.first.first), dataToCanvasY(line.first.second))
+                val end =
+                    Offset(dataToCanvasX(line.second.first), dataToCanvasY(line.second.second))
                 drawLine(verde, start, end, 0.7.dp.toPx(localDensity))
             }
 
@@ -665,16 +739,31 @@ private fun CartesianGraphBase(
                 for (i in 0..numX) {
                     val xData = i * labelInterval
                     val xCanvas = dataToCanvasX(xData)
-                    drawLine(Color.LightGray.copy(alpha = 0.5f), Offset(xCanvas, 0f), Offset(xCanvas, actualCanvasHeight), 0.5.dp.toPx(localDensity))
+                    drawLine(
+                        Color.LightGray.copy(alpha = 0.5f),
+                        Offset(xCanvas, 0f),
+                        Offset(xCanvas, actualCanvasHeight),
+                        0.5.dp.toPx(localDensity)
+                    )
                     if (i > 0) {
-                        drawContext.canvas.nativeCanvas.drawText(xData.toInt().toString(), xCanvas, actualCanvasHeight + 12.dp.toPx(localDensity), gridLabelPaint)
+                        drawContext.canvas.nativeCanvas.drawText(
+                            xData.toInt().toString(),
+                            xCanvas,
+                            actualCanvasHeight + 12.dp.toPx(localDensity),
+                            gridLabelPaint
+                        )
                     }
                 }
                 val numY = (maxY / labelInterval).toInt()
                 for (i in 0..numY) {
                     val yData = i * labelInterval
                     val yCanvas = dataToCanvasY(yData)
-                    drawLine(Color.LightGray.copy(alpha = 0.5f), Offset(0f, yCanvas), Offset(actualCanvasWidth, yCanvas), 0.5.dp.toPx(localDensity))
+                    drawLine(
+                        Color.LightGray.copy(alpha = 0.5f),
+                        Offset(0f, yCanvas),
+                        Offset(actualCanvasWidth, yCanvas),
+                        0.5.dp.toPx(localDensity)
+                    )
                     if (i > 0) {
                         drawContext.canvas.nativeCanvas.drawText(
                             yData.toInt().toString(),
@@ -699,37 +788,41 @@ private fun CartesianGraphBase(
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             }
+
             // HCO3
-            // 1) Ángulo de la recta pA→pB en coordenadas de lienzo
-            val pA = Offset(dataToCanvasX(4.73744f),  dataToCanvasY(18.815413f))
+            val pA = Offset(dataToCanvasX(4.73744f), dataToCanvasY(18.815413f))
             val pB = Offset(dataToCanvasX(18.07213f), dataToCanvasY(5.742082f))
             val angleRad = kotlin.math.atan2(pB.y - pA.y, pB.x - pA.x)
             val angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
 
-            // 2) Punto donde debe empezar la 1ª letra: (3,18)
             val anchorX = dataToCanvasX(1f)
             val anchorY = dataToCanvasY(20f)
 
-            // 3) (opcional) empujar un pelín “por debajo” de la recta
-            val nudgePerp = 3.dp.toPx(localDensity) // pon 0 para exacto; prueba 4.dp si quieres despegarlo
-            val nx = kotlin.math.cos(angleRad + Math.PI/2).toFloat()
-            val ny = kotlin.math.sin(angleRad + Math.PI/2).toFloat()
+            val nudgePerp = 3.dp.toPx(localDensity)
+            val nx = kotlin.math.cos(angleRad + Math.PI / 2).toFloat()
+            val ny = kotlin.math.sin(angleRad + Math.PI / 2).toFloat()
             val x = anchorX + nx * nudgePerp
             val y = anchorY + ny * nudgePerp
 
-            // 4) Pintura: alinear a la IZQUIERDA para que el (x,y) sea el inicio de la 1ª letra
-            val hco3Paint = android.graphics.Paint(axisLabelPaint).apply {
-                textAlign = android.graphics.Paint.Align.LEFT
+            val hco3Paint = Paint(axisLabelPaint).apply {
+                textAlign = Paint.Align.LEFT
             }
 
             drawIntoCanvas { canvas ->
                 canvas.nativeCanvas.save()
-                canvas.nativeCanvas.rotate(angleDeg, x, y)   // paralelo a pA→pB
+                canvas.nativeCanvas.rotate(angleDeg, x, y)
                 canvas.nativeCanvas.drawText("HCO₃⁻ (mEq/L)", x, y, hco3Paint)
                 canvas.nativeCanvas.restore()
             }
+
             // CO2
-            drawContext.canvas.nativeCanvas.drawText("pCO₂ (mmHg)", dataToCanvasX(maxX / 2f), actualCanvasHeight + 25.dp.toPx(localDensity), axisLabelPaint)
+            drawContext.canvas.nativeCanvas.drawText(
+                "pCO₂ (mmHg)",
+                dataToCanvasX(maxX / 2f),
+                actualCanvasHeight + 25.dp.toPx(localDensity),
+                axisLabelPaint
+            )
+
             // pH (derecha)
             drawIntoCanvas { canvas ->
                 val phLabelX = actualCanvasWidth - 10.dp.toPx(localDensity)
@@ -737,10 +830,15 @@ private fun CartesianGraphBase(
                 canvas.nativeCanvas.save()
                 canvas.nativeCanvas.translate(phLabelX, phLabelY)
                 canvas.nativeCanvas.rotate(-90f)
-                canvas.nativeCanvas.drawText("pH", 0f, 0f + axisLabelPaint.textSize / 3,
-                    axisLabelPaint.apply { color = android.graphics.Color.MAGENTA; textSize = phAxisLabelFontSize.toPx(localDensity) })
+                canvas.nativeCanvas.drawText(
+                    "pH", 0f, 0f + axisLabelPaint.textSize / 3,
+                    axisLabelPaint.apply {
+                        color = android.graphics.Color.MAGENTA
+                        textSize = phAxisLabelFontSize.toPx(localDensity)
+                    })
                 canvas.nativeCanvas.restore()
             }
+
             // [H+] (izquierda)
             drawIntoCanvas { canvas ->
                 val hPlusLabelX = 10.dp.toPx(localDensity)
@@ -748,21 +846,23 @@ private fun CartesianGraphBase(
                 canvas.nativeCanvas.save()
                 canvas.nativeCanvas.translate(hPlusLabelX, hPlusLabelY)
                 canvas.nativeCanvas.rotate(-90f)
-                canvas.nativeCanvas.drawText("[H⁺] (nEq/L)", 0f, 0f + axisLabelPaint.textSize / 3, axisLabelPaint)
+                canvas.nativeCanvas.drawText(
+                    "[H⁺] (nEq/L)",
+                    0f,
+                    0f + axisLabelPaint.textSize / 3,
+                    axisLabelPaint
+                )
                 canvas.nativeCanvas.restore()
             }
 
-            // Labels de referencia (mismos)
-            val referenceLabelPaint = Paint().apply { isAntiAlias = true; textAlign = Paint.Align.CENTER }
-            val labelData: List<ReferenceLabelInfo> = listOf(
-                ReferenceLabelInfo("9", 35.87937f, 95f, 9.dp, android.graphics.Color.BLACK),
-                ReferenceLabelInfo("33", 95f, 68.601074f, 9.dp, android.graphics.Color.BLACK),
-                ReferenceLabelInfo("45", 95f, 50.30745f, 9.dp, android.graphics.Color.BLACK),
-                ReferenceLabelInfo("75", 95f, 30.18447f, 7.dp, android.graphics.Color.WHITE, Typeface.create(Typeface.DEFAULT, Typeface.BOLD)),
-                ReferenceLabelInfo("72", 95f, 31.44216f, 7.dp, android.graphics.Color.BLACK),
-                ReferenceLabelInfo("69", 95f, 32.80921f, 7.dp, android.graphics.Color.BLACK),
-            )
-            labelData.forEach { labelInfo ->
+            // Labels de referencia
+            val referenceLabelPaint = Paint().apply {
+                isAntiAlias = true
+                textAlign = Paint.Align.CENTER
+            }
+
+            // USAMOS LAS ETIQUETAS PASADAS COMO PARÁMETRO
+            referenceLabels.forEach { labelInfo ->
                 drawContext.canvas.nativeCanvas.drawText(
                     labelInfo.text,
                     dataToCanvasX(labelInfo.xData),
@@ -776,7 +876,20 @@ private fun CartesianGraphBase(
             }
 
             // Puntos de pH (lado derecho)
-            val baseRefs = listOf(5.71f, 9.97f, 17.83f, 21.94f, 26.84f, 38.46f, 45.36f, 51.22f, 57.04f, 64.32f, 81.3f, 100f)
+            val baseRefs = listOf(
+                5.71f,
+                9.97f,
+                17.83f,
+                21.94f,
+                26.84f,
+                38.46f,
+                45.36f,
+                51.22f,
+                57.04f,
+                64.32f,
+                81.3f,
+                100f
+            )
             val phRefs = if (maxY > 100f) baseRefs + listOf(113.50f, 132.40f, 158.90f) else baseRefs
             val phPointRadius = 2.dp.toPx(localDensity)
             val phPointPaint = Paint().apply { color = android.graphics.Color.RED }
@@ -801,7 +914,7 @@ private fun CartesianGraphBase(
                 }
             }
 
-            // Punto actual
+            // ========== PUNTO ACTUAL CON EFECTO BLINK ==========
             if (currentPH > 0 && currentCO2 > 0) {
                 val hPlus = 10.0.pow((9.0 - currentPH).toDouble()).toFloat()
                 val x = currentCO2
@@ -809,8 +922,20 @@ private fun CartesianGraphBase(
                 if (x in 0f..maxX && y in 0f..maxY) {
                     val cx = dataToCanvasX(x)
                     val cy = dataToCanvasY(y)
-                    drawPoints(points = listOf(Offset(cx, cy)), pointMode = PointMode.Points, color = Pink80, strokeWidth = 6.dp.toPx(localDensity))
-                    drawCircle(color = Pink80.copy(alpha = 0.5f), radius = 8.dp.toPx(localDensity), center = Offset(cx, cy), style = Stroke(width = 1.dp.toPx(localDensity)))
+
+                    // Punto con efecto blink
+                    drawPoints(
+                        points = listOf(Offset(cx, cy)),
+                        pointMode = PointMode.Points,
+                        color = Pink80.copy(alpha = blinkAlpha),
+                        strokeWidth = 6.dp.toPx(localDensity)
+                    )
+                    drawCircle(
+                        color = Pink80.copy(alpha = 0.5f * blinkAlpha),
+                        radius = 8.dp.toPx(localDensity),
+                        center = Offset(cx, cy),
+                        style = Stroke(width = 1.dp.toPx(localDensity))
+                    )
                 }
             }
         }
@@ -826,7 +951,8 @@ fun CartesianGraphCO2_0_100_h100_160(
     lines: List<Pair<Pair<Float, Float>, Pair<Float, Float>>> = emptyList(),
     currentPH: Float,
     currentCO2: Float,
-    phAxisLabelFontSize: Dp = 14.dp
+    phAxisLabelFontSize: Dp = 14.dp,
+    referenceLabels: List<ReferenceLabelInfo> = emptyList()
 ) {
     CartesianGraphBase(
         modifier = modifier,
@@ -836,7 +962,8 @@ fun CartesianGraphCO2_0_100_h100_160(
         lines = lines,
         currentPH = currentPH,
         currentCO2 = currentCO2,
-        phAxisLabelFontSize = phAxisLabelFontSize
+        phAxisLabelFontSize = phAxisLabelFontSize,
+        referenceLabels = referenceLabels
     )
 }
 
@@ -848,7 +975,8 @@ fun CartesianGraph100_160all(
     lines: List<Pair<Pair<Float, Float>, Pair<Float, Float>>> = emptyList(),
     currentPH: Float,
     currentCO2: Float,
-    phAxisLabelFontSize: Dp = 14.dp
+    phAxisLabelFontSize: Dp = 14.dp,
+    referenceLabels: List<ReferenceLabelInfo> = emptyList()
 ) {
     CartesianGraphBase(
         modifier = modifier,
@@ -858,19 +986,21 @@ fun CartesianGraph100_160all(
         lines = lines,
         currentPH = currentPH,
         currentCO2 = currentCO2,
-        phAxisLabelFontSize = phAxisLabelFontSize
+        phAxisLabelFontSize = phAxisLabelFontSize,
+        referenceLabels = referenceLabels
     )
 }
 
 // Posibilidad 3: [H+] 0..100, CO2 0..160
 @Composable
-fun CartesianGraghCO2100_160_H0_100(   // (mantenido el nombre tal como lo usas)
+fun CartesianGraghCO2100_160_H0_100(
     modifier: Modifier = Modifier,
     labelInterval: Float = 10f,
     lines: List<Pair<Pair<Float, Float>, Pair<Float, Float>>> = emptyList(),
     currentPH: Float,
     currentCO2: Float,
-    phAxisLabelFontSize: Dp = 14.dp
+    phAxisLabelFontSize: Dp = 14.dp,
+    referenceLabels: List<ReferenceLabelInfo> = emptyList()
 ) {
     CartesianGraphBase(
         modifier = modifier,
@@ -880,7 +1010,7 @@ fun CartesianGraghCO2100_160_H0_100(   // (mantenido el nombre tal como lo usas)
         lines = lines,
         currentPH = currentPH,
         currentCO2 = currentCO2,
-        phAxisLabelFontSize = phAxisLabelFontSize
+        phAxisLabelFontSize = phAxisLabelFontSize,
+        referenceLabels = referenceLabels
     )
 }
-
