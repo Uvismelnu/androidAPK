@@ -1011,6 +1011,6 @@ fun CartesianGraghCO2100_160_H0_100(
         currentPH = currentPH,
         currentCO2 = currentCO2,
         phAxisLabelFontSize = phAxisLabelFontSize,
-        referenceLabels = referenceLabels
+        referenceLabels = referenceLabels//internet
     )
 }
