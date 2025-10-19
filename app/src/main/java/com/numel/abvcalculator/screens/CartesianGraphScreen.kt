@@ -493,7 +493,7 @@ fun CartesianGraphScreen(
 
             // ========== PUNTO DE DATOS CON EFECTO BLINK ==========
             if (currentPH > 0 && currentCO2 > 0) {
-                val hPlusData = 10.0.pow((9.0 - currentPH).toDouble())
+                val hPlusData = 10.0.pow((9.0 - currentPH))
                 val xDataPoint = currentCO2
                 val yDataPoint = hPlusData.toFloat()
 
@@ -530,7 +530,8 @@ private fun CartesianGraphBase(
     currentPH: Float,
     currentCO2: Float,
     phAxisLabelFontSize: Dp = 14.dp,
-    referenceLabels: List<ReferenceLabelInfo> = emptyList()
+    referenceLabels: List<ReferenceLabelInfo> = emptyList(),
+            isCO2100_160_H0_100: Boolean = false
 ) {
     val localDensity = LocalDensity.current
 
@@ -788,32 +789,49 @@ private fun CartesianGraphBase(
                 textAlign = Paint.Align.CENTER
                 typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             }
+// === ETIQUETA DINÁMICA HCO₃⁻ (mEq/L) ===
+            if (lines.isNotEmpty()) {
+                // USAR PRIMERA LÍNEA para todos los gráficos EXCEPTO CO2100_160_H0_100
+                val lineToUse = if (isCO2100_160_H0_100) lines.last() else lines.first()
+                val (p1, p2) = lineToUse
+                val (x1, y1) = p1
+                val (x2, y2) = p2
 
-            // HCO3
-            val pA = Offset(dataToCanvasX(4.73744f), dataToCanvasY(18.815413f))
-            val pB = Offset(dataToCanvasX(18.07213f), dataToCanvasY(5.742082f))
-            val angleRad = kotlin.math.atan2(pB.y - pA.y, pB.x - pA.x)
-            val angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
+                // Punto medio de la línea
+                val midX = (x1 + x2) / 2f
+                val midY = (y1 + y2) / 2f
 
-            val anchorX = dataToCanvasX(1f)
-            val anchorY = dataToCanvasY(20f)
+                // Ángulo de la línea
+                val angleRad = kotlin.math.atan2(
+                    dataToCanvasY(y2) - dataToCanvasY(y1),
+                    dataToCanvasX(x2) - dataToCanvasX(x1)
+                )
+                val angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
 
-            val nudgePerp = 3.dp.toPx(localDensity)
-            val nx = kotlin.math.cos(angleRad + Math.PI / 2).toFloat()
-            val ny = kotlin.math.sin(angleRad + Math.PI / 2).toFloat()
-            val x = anchorX + nx * nudgePerp
-            val y = anchorY + ny * nudgePerp
+                // Desplazamiento perpendicular (hacia "abajo")
+                val offset = 6.dp.toPx(localDensity)
+                val nx = kotlin.math.cos(angleRad + Math.PI / 2).toFloat()
+                val ny = kotlin.math.sin(angleRad + Math.PI / 2).toFloat()
 
-            val hco3Paint = Paint(axisLabelPaint).apply {
-                textAlign = Paint.Align.LEFT
+                val labelX = dataToCanvasX(midX) + nx * offset
+                val labelY = dataToCanvasY(midY) + ny * offset
+
+                val hco3Paint = Paint().apply {
+                    isAntiAlias = true
+                    color = android.graphics.Color.BLACK
+                    textSize = 10.dp.toPx(localDensity)
+                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                    textAlign = Paint.Align.CENTER
+                }
+
+                drawIntoCanvas { canvas ->
+                    canvas.nativeCanvas.save()
+                    canvas.nativeCanvas.rotate(angleDeg, labelX, labelY)
+                    canvas.nativeCanvas.drawText("HCO₃⁻ (mEq/L)", labelX, labelY, hco3Paint)
+                    canvas.nativeCanvas.restore()
+                }
             }
 
-            drawIntoCanvas { canvas ->
-                canvas.nativeCanvas.save()
-                canvas.nativeCanvas.rotate(angleDeg, x, y)
-                canvas.nativeCanvas.drawText("HCO₃⁻ (mEq/L)", x, y, hco3Paint)
-                canvas.nativeCanvas.restore()
-            }
 
             // CO2
             drawContext.canvas.nativeCanvas.drawText(
@@ -916,7 +934,7 @@ private fun CartesianGraphBase(
 
             // ========== PUNTO ACTUAL CON EFECTO BLINK ==========
             if (currentPH > 0 && currentCO2 > 0) {
-                val hPlus = 10.0.pow((9.0 - currentPH).toDouble()).toFloat()
+                val hPlus = 10.0.pow((9.0 - currentPH)).toFloat()
                 val x = currentCO2
                 val y = hPlus
                 if (x in 0f..maxX && y in 0f..maxY) {
@@ -963,7 +981,8 @@ fun CartesianGraphCO2_0_100_h100_160(
         currentPH = currentPH,
         currentCO2 = currentCO2,
         phAxisLabelFontSize = phAxisLabelFontSize,
-        referenceLabels = referenceLabels
+        referenceLabels = referenceLabels,
+        isCO2100_160_H0_100 = false // NO es este tipo de gráfico
     )
 }
 
@@ -987,7 +1006,8 @@ fun CartesianGraph100_160all(
         currentPH = currentPH,
         currentCO2 = currentCO2,
         phAxisLabelFontSize = phAxisLabelFontSize,
-        referenceLabels = referenceLabels
+        referenceLabels = referenceLabels,
+        isCO2100_160_H0_100 = false // NO es este tipo de gráfico
     )
 }
 
@@ -1011,6 +1031,7 @@ fun CartesianGraghCO2100_160_H0_100(
         currentPH = currentPH,
         currentCO2 = currentCO2,
         phAxisLabelFontSize = phAxisLabelFontSize,
-        referenceLabels = referenceLabels//internet
+        referenceLabels = referenceLabels,
+        isCO2100_160_H0_100 = true // SÍ es este tipo de gráfico
     )
 }
