@@ -41,6 +41,8 @@ import com.numel.abvcalculator.navigation.ScreenData
 import com.numel.abvcalculator.navigation.ScreenData1
 import com.numel.abvcalculator.viewModel.MainViewModel
 
+// Valor de albúmina de referencia (se usa si el usuario no ingresa el campo)
+private const val ALBUMINA_DEFAULT = 4.0
 
 @Composable
 fun AcidoBase(
@@ -49,20 +51,23 @@ fun AcidoBase(
     screenData1: ScreenData1,
     viewModel: MainViewModel
 ) {
-    var newText1 by remember { mutableStateOf(screenData.text) }
-    var txPharterial by remember { mutableStateOf(viewModel.sharedPHa.value) }
-    var txCO2arterial by remember { mutableStateOf(viewModel.sharedCO2a.value) }
-    var txHCO3 by remember { mutableStateOf(viewModel.sharedHCO3.value) }
-    var txNa by remember { mutableStateOf(viewModel.sharedNa.value) }
-    var txK by remember { mutableStateOf(viewModel.sharedK.value) }
-    var txCl by remember { mutableStateOf(viewModel.sharedCl.value) }
+    var newText1        by remember { mutableStateOf(screenData.text) }
+    var txPharterial    by remember { mutableStateOf(viewModel.sharedPHa.value) }
+    var txCO2arterial   by remember { mutableStateOf(viewModel.sharedCO2a.value) }
+    var txHCO3          by remember { mutableStateOf(viewModel.sharedHCO3.value) }
+    var txNa            by remember { mutableStateOf(viewModel.sharedNa.value) }
+    var txK             by remember { mutableStateOf(viewModel.sharedK.value) }
+    var txCl            by remember { mutableStateOf(viewModel.sharedCl.value) }
+    // Albúmina: campo opcional. Si se deja vacío se usa 4.0 g/dL (normal)
+    var txAlbumina      by remember { mutableStateOf("") }
+
     val maxLength = 6
-    val context = LocalContext.current // Obtiene el contexto actual
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), // Add padding for better spacing
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
@@ -71,19 +76,22 @@ fun AcidoBase(
             label = { Text("Editar texto 1") },
             modifier = Modifier.padding(8.dp)
         )
+
         Text(
             text = "Ingrese todos los datos",
             color = Color.White,
             fontSize = 22.sp,
             fontStyle = FontStyle.Italic
         )
+
+        // ── Fila 1: pH y pCO2 ──────────────────────────────────────────────
         LazyRow(
             modifier = Modifier
                 .padding(horizontal = 2.dp, vertical = 2.dp)
                 .align(Alignment.CenterHorizontally)
-
         ) {
             item {
+                // pH
                 var isPharterialError by remember { mutableStateOf(false) }
                 val blinkAlpha by animateFloatAsState(
                     targetValue = if (isPharterialError) 1f else 0f,
@@ -92,55 +100,45 @@ fun AcidoBase(
                         repeatMode = RepeatMode.Reverse
                     ), label = ""
                 )
-
                 OutlinedTextField(
                     value = txPharterial,
                     onValueChange = { newValue ->
-                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        val sanitized = newValue.replace(',', '.')
                         if (newValue.length <= maxLength) {
-                            txPharterial = sanitizedValue
+                            txPharterial = sanitized
                             viewModel.updateSharedPHa(txPharterial)
                         }
-                        val pharterialValue = sanitizedValue.toDoubleOrNull()
-                        isPharterialError =
-                            pharterialValue == null || pharterialValue < 6.7 || pharterialValue > 8.2
+                        val v = sanitized.toDoubleOrNull()
+                        isPharterialError = v == null || v < 6.7 || v > 8.2
                     },
-                    label = { Text(text = "Ph", color = Color.White, fontSize = 12.sp) },
-                    placeholder = {
-                        Text(
-                            text = "arterial",
-                            color = Color.White,
-                            fontSize = 12.sp
-                        )
-                    },
+                    label       = { Text("pH",       color = Color.White, fontSize = 12.sp) },
+                    placeholder = { Text("arterial", color = Color.White, fontSize = 12.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .background(Color.DarkGray)
-                        .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
+                        focusedTextColor   = Color.White,
                         unfocusedTextColor = Color.LightGray,
-                        cursorColor = Color.White
+                        cursorColor        = Color.White
                     ),
-                    isError = isPharterialError, // Show error state
+                    isError = isPharterialError,
                     supportingText = {
-                        if (isPharterialError) {
-                            Text(
-                                text = "Valor entre 6.7 y 8.2",
-                                color = Color.White.copy(alpha = blinkAlpha) // Apply alpha animation
-                            )
-                        }
+                        if (isPharterialError) Text(
+                            text  = "Valor entre 6.7 y 8.2",
+                            color = Color.White.copy(alpha = blinkAlpha)
+                        )
                     },
                     shape = RoundedCornerShape(20.dp)
                 )
 
-
                 Spacer(modifier = Modifier.size(5.dp))
+
+                // pCO2
                 var isCO2arterialError by remember { mutableStateOf(false) }
-                val blinkAlphaCO2arterial by animateFloatAsState(
+                val blinkAlphaCO2 by animateFloatAsState(
                     targetValue = if (isCO2arterialError) 1f else 0f,
                     animationSpec = infiniteRepeatable(
                         animation = tween(durationMillis = 500, easing = LinearEasing),
@@ -150,64 +148,47 @@ fun AcidoBase(
                 OutlinedTextField(
                     value = txCO2arterial,
                     onValueChange = { newValue ->
-                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        val sanitized = newValue.replace(',', '.')
                         if (newValue.length <= maxLength) {
-                            txCO2arterial = sanitizedValue
+                            txCO2arterial = sanitized
                             viewModel.updateSharedCO2a(txCO2arterial)
                         }
-                        val co2ArterialValue = sanitizedValue.toDoubleOrNull()
-                        isCO2arterialError =
-                            co2ArterialValue == null || co2ArterialValue < 2.0 || co2ArterialValue > 300.0
+                        val v = sanitized.toDoubleOrNull()
+                        isCO2arterialError = v == null || v < 2.0 || v > 300.0
                     },
-                    label = {
-                        Text(
-                            text = "CO2",
-                            color = Color.Black,
-                            fontSize = 12.sp
-                        )
-                    },
-                    placeholder = {
-                        Text(
-                            text = "arterial",
-                            color = Color.Black,
-                            fontSize = 12.sp
-                        )
-                    },
+                    label       = { Text("pCO2",    color = Color.Black, fontSize = 12.sp) },
+                    placeholder = { Text("arterial", color = Color.Black, fontSize = 12.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .background(Color.LightGray)
-                        .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
+                        focusedTextColor   = Color.Black,
                         unfocusedTextColor = Color.DarkGray,
-                        cursorColor = Color.Black
+                        cursorColor        = Color.Black
                     ),
-                    isError = isCO2arterialError, // Show error state
+                    isError = isCO2arterialError,
                     supportingText = {
-                        if (isCO2arterialError) {
-                            Text(
-                                text = "Valor entre 2.0 y 300.0",
-                                color = Color.Black.copy(alpha = blinkAlphaCO2arterial) // Apply alpha animation
-                            )
-                        }
+                        if (isCO2arterialError) Text(
+                            text  = "Valor entre 2.0 y 300.0",
+                            color = Color.Black.copy(alpha = blinkAlphaCO2)
+                        )
                     },
                     shape = RoundedCornerShape(20.dp)
-
-
                 )
-
             }
         }
+
+        // ── Fila 2: HCO3 y Na ──────────────────────────────────────────────
         LazyRow(
             modifier = Modifier
                 .padding(horizontal = 2.dp, vertical = 2.dp)
                 .align(Alignment.CenterHorizontally)
-
         ) {
             item {
+                // HCO3
                 var isHCO3Error by remember { mutableStateOf(false) }
                 val blinkAlphaHCO3 by animateFloatAsState(
                     targetValue = if (isHCO3Error) 1f else 0f,
@@ -219,46 +200,39 @@ fun AcidoBase(
                 OutlinedTextField(
                     value = txHCO3,
                     onValueChange = { newValue ->
-                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        val sanitized = newValue.replace(',', '.')
                         if (newValue.length <= maxLength) {
-                            txHCO3 = sanitizedValue
+                            txHCO3 = sanitized
                             viewModel.updateSharedHCO3(txHCO3)
                         }
-                        val hco3Value = sanitizedValue.toDoubleOrNull()
-                        isHCO3Error = hco3Value == null || hco3Value < 1.0 || hco3Value > 50.0
+                        val v = sanitized.toDoubleOrNull()
+                        isHCO3Error = v == null || v < 1.0 || v > 50.0
                     },
-                    label = {
-                        Text(
-                            text = "HCO3",
-                            color = Color.White,
-                            fontSize = 12.sp
-                        )
-                    },
+                    label = { Text("HCO3", color = Color.White, fontSize = 12.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .background(Color.DarkGray)
-                        .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
+                        focusedTextColor   = Color.White,
                         unfocusedTextColor = Color.LightGray,
-                        cursorColor = Color.White
+                        cursorColor        = Color.White
                     ),
-                    isError = isHCO3Error, // Show error state
+                    isError = isHCO3Error,
                     supportingText = {
-                        if (isHCO3Error) {
-                            Text(
-                                text = "Valor entre 1.0 y 50.0",
-                                color = Color.White.copy(alpha = blinkAlphaHCO3) // Apply alpha animation
-                            )
-                        }
+                        if (isHCO3Error) Text(
+                            text  = "Valor entre 1.0 y 50.0",
+                            color = Color.White.copy(alpha = blinkAlphaHCO3)
+                        )
                     },
                     shape = RoundedCornerShape(20.dp)
-
-
                 )
+
+                Spacer(modifier = Modifier.size(5.dp))
+
+                // Na
                 var isNaError by remember { mutableStateOf(false) }
                 val blinkAlphaNa by animateFloatAsState(
                     targetValue = if (isNaError) 1f else 0f,
@@ -270,56 +244,46 @@ fun AcidoBase(
                 OutlinedTextField(
                     value = txNa,
                     onValueChange = { newValue ->
-                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        val sanitized = newValue.replace(',', '.')
                         if (newValue.length <= maxLength) {
-                            txNa = sanitizedValue
+                            txNa = sanitized
                             viewModel.updateSharedNa(txNa)
-
                         }
-                        val naValue = sanitizedValue.toDoubleOrNull()
-                        isNaError = naValue == null || naValue < 90.0 || naValue > 220.0
+                        val v = sanitized.toDoubleOrNull()
+                        isNaError = v == null || v < 90.0 || v > 220.0
                     },
-                    label = {
-                        Text(
-                            text = "Na",
-                            color = Color.White,
-                            fontSize = 12.sp
-                        )
-                    },
+                    label = { Text("Na", color = Color.White, fontSize = 12.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .background(Color.DarkGray)
-                        .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
+                        focusedTextColor   = Color.White,
                         unfocusedTextColor = Color.LightGray,
-                        cursorColor = Color.White
+                        cursorColor        = Color.White
                     ),
-                    isError = isNaError, // Show error state
+                    isError = isNaError,
                     supportingText = {
-                        if (isNaError) {
-                            Text(
-                                text = "Valor entre 90.0 y 220.0",
-                                color = Color.White.copy(alpha = blinkAlphaNa) // Apply alpha animation
-                            )
-                        }
+                        if (isNaError) Text(
+                            text  = "Valor entre 90.0 y 220.0",
+                            color = Color.White.copy(alpha = blinkAlphaNa)
+                        )
                     },
                     shape = RoundedCornerShape(20.dp)
-
                 )
-
             }
         }
+
+        // ── Fila 3: K y Cl ────────────────────────────────────────────────
         LazyRow(
             modifier = Modifier
                 .padding(horizontal = 2.dp, vertical = 2.dp)
                 .align(Alignment.CenterHorizontally)
-
         ) {
             item {
+                // K
                 var isKError by remember { mutableStateOf(false) }
                 val blinkAlphaK by animateFloatAsState(
                     targetValue = if (isKError) 1f else 0f,
@@ -331,43 +295,39 @@ fun AcidoBase(
                 OutlinedTextField(
                     value = txK,
                     onValueChange = { newValue ->
-                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        val sanitized = newValue.replace(',', '.')
                         if (newValue.length <= maxLength) {
-                            txK = sanitizedValue
+                            txK = sanitized
                             viewModel.updateSharedK(txK)
                         }
-                        val kValue = sanitizedValue.toDoubleOrNull()
-                        isKError = kValue == null || kValue < 0.5 || kValue > 10.0
+                        val v = sanitized.toDoubleOrNull()
+                        isKError = v == null || v < 0.5 || v > 10.0
                     },
-                    label = { Text(text = "K", color = Color.Black, fontSize = 12.sp) },
-
-
+                    label = { Text("K", color = Color.Black, fontSize = 12.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-
                     modifier = Modifier
                         .background(Color.LightGray)
-                        .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
+                        focusedTextColor   = Color.Black,
                         unfocusedTextColor = Color.DarkGray,
-                        cursorColor = Color.Black
+                        cursorColor        = Color.Black
                     ),
-                    isError = isKError, // Show error state
+                    isError = isKError,
                     supportingText = {
-                        if (isKError) {
-                            Text(
-                                text = "Valor entre 0.5 y 10.0",
-                                color = Color.Black.copy(alpha = blinkAlphaK) // Apply alpha animation
-                            )
-                        }
+                        if (isKError) Text(
+                            text  = "Valor entre 0.5 y 10.0",
+                            color = Color.Black.copy(alpha = blinkAlphaK)
+                        )
                     },
                     shape = RoundedCornerShape(20.dp)
-
-
                 )
+
+                Spacer(modifier = Modifier.size(5.dp))
+
+                // Cl
                 var isClError by remember { mutableStateOf(false) }
                 val blinkAlphaCl by animateFloatAsState(
                     targetValue = if (isClError) 1f else 0f,
@@ -379,100 +339,163 @@ fun AcidoBase(
                 OutlinedTextField(
                     value = txCl,
                     onValueChange = { newValue ->
-                        val sanitizedValue = newValue.replace(',', '.') // Replace comma with dot
+                        val sanitized = newValue.replace(',', '.')
                         if (newValue.length <= maxLength) {
-                            txCl = sanitizedValue
+                            txCl = sanitized
                             viewModel.updateSharedCl(txCl)
                         }
-                        val clValue = sanitizedValue.toDoubleOrNull()
-                        isClError = clValue == null || clValue < 60.0 || clValue > 250.0
+                        val v = sanitized.toDoubleOrNull()
+                        isClError = v == null || v < 60.0 || v > 250.0
                     },
-                    label = {
-                        Text(
-                            text = "Cl",
-                            color = Color.White,
-                            fontSize = 12.sp
-                        )
-                    },
+                    label = { Text("Cl", color = Color.White, fontSize = 12.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .background(Color.DarkGray)
-                        .weight(2F)
                         .padding(horizontal = 2.dp, vertical = 2.dp)
                         .width(120.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
+                        focusedTextColor   = Color.White,
                         unfocusedTextColor = Color.LightGray,
-                        cursorColor = Color.White
+                        cursorColor        = Color.White
                     ),
-                    isError = isClError, // Show error state
+                    isError = isClError,
                     supportingText = {
-                        if (isClError) {
-                            Text(
-                                text = "Valor entre 60.0 y 250.0",
-                                color = Color.White.copy(alpha = blinkAlphaCl) // Apply alpha animation
-                            )
-                        }
+                        if (isClError) Text(
+                            text  = "Valor entre 60.0 y 250.0",
+                            color = Color.White.copy(alpha = blinkAlphaCl)
+                        )
                     },
                     shape = RoundedCornerShape(20.dp)
-
                 )
-
             }
         }
 
+        // ── Fila 4: Albúmina (opcional) ────────────────────────────────────
+        // Si se deja vacío se asume 4.0 g/dL (normal).
+        // Es importante para la corrección del Anion Gap en pacientes desnutridos,
+        // cirróticos, nefróticos o en UCI.
+        LazyRow(
+            modifier = Modifier
+                .padding(horizontal = 2.dp, vertical = 2.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            item {
+                var isAlbuminaError by remember { mutableStateOf(false) }
+                val blinkAlphaAlb by animateFloatAsState(
+                    targetValue = if (isAlbuminaError) 1f else 0f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse
+                    ), label = ""
+                )
+                OutlinedTextField(
+                    value = txAlbumina,
+                    onValueChange = { newValue ->
+                        val sanitized = newValue.replace(',', '.')
+                        if (newValue.length <= maxLength) txAlbumina = sanitized
+                        val v = sanitized.toDoubleOrNull()
+                        // Solo error si el campo tiene algo y está fuera de rango
+                        isAlbuminaError = sanitized.isNotBlank() && (v == null || v < 0.5 || v > 7.0)
+                    },
+                    label       = { Text("Albúmina g/dL", color = Color.Black, fontSize = 12.sp) },
+                    placeholder = { Text("Opcional (def: 4.0)", color = Color.Black, fontSize = 10.sp) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .background(Color.LightGray)
+                        .padding(horizontal = 2.dp, vertical = 2.dp)
+                        .width(180.dp),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor   = Color.Black,
+                        unfocusedTextColor = Color.DarkGray,
+                        cursorColor        = Color.Black
+                    ),
+                    isError = isAlbuminaError,
+                    supportingText = {
+                        if (isAlbuminaError) Text(
+                            text  = "Valor entre 0.5 y 7.0",
+                            color = Color.Black.copy(alpha = blinkAlphaAlb)
+                        )
+                    },
+                    shape = RoundedCornerShape(20.dp)
+                )
+            }
+        }
 
+        // ── Botón calcular ──────────────────────────────────────────────────
         Button(
             onClick = {
-                // Validar que todos los campos tengan valores numéricos
-                val phVal = txPharterial.toDoubleOrNull()
-                val co2Val = txCO2arterial.toDoubleOrNull()
-                val hco3Val = txHCO3.toDoubleOrNull()
-                val naVal = txNa.toDoubleOrNull()
-                val kVal = txK.toDoubleOrNull()
-                val clVal = txCl.toDoubleOrNull()
+                val phVal      = txPharterial.toDoubleOrNull()
+                val co2Val     = txCO2arterial.toDoubleOrNull()
+                val hco3Val    = txHCO3.toDoubleOrNull()
+                val naVal      = txNa.toDoubleOrNull()
+                val kVal       = txK.toDoubleOrNull()
+                val clVal      = txCl.toDoubleOrNull()
+                // Albúmina: si está vacío o inválido usa 4.0 por defecto
+                val albuminaVal = txAlbumina.toDoubleOrNull()
+                    ?.takeIf { it in 0.5..7.0 }
+                    ?: ALBUMINA_DEFAULT
 
-                if (phVal != null && co2Val != null && hco3Val != null && naVal != null && kVal != null && clVal != null) {
-                    viewModel.updateText1(acidobase(hco3Val, co2Val, phVal, naVal, kVal, clVal))
+                if (phVal != null && co2Val != null && hco3Val != null
+                    && naVal != null && kVal != null && clVal != null
+                ) {
+                    // ── Llamada correcta a la nueva firma de acidobase() ──
+                    // Los argumentos son nombrados para evitar errores de orden.
+                    // .textoCompleto() convierte AcidoBaseResultado → String.
+                    val resultadoTexto = acidobase(
+                        pH       = phVal,
+                        pco2     = co2Val,
+                        hco3     = hco3Val,
+                        na       = naVal,
+                        cl       = clVal,
+                        k        = kVal,
+                        albumina = albuminaVal
+                    ).textoCompleto()
+
+                    viewModel.updateText1(resultadoTexto)
                     viewModel.updateTxPharterial(txPharterial)
                     viewModel.updateTxCO2arterial(txCO2arterial)
-                    if (viewModel.txCO2arterial.value.toFloat() < 100.0 && viewModel.txPharterial.value.toFloat() in 7.0..8.24) {
-                        viewModel.isScreen1Visible = true
-                        viewModel.isScreenCO2100_160_H_0_100Visible = false
-                        viewModel.isScreenCO2100_160_H_100_160Visible = false
-                        viewModel.isScreenCO2_0_100_h100_160Visible = false
 
+                    // Lógica de navegación sin cambios
+                    when {
+                        co2Val < 100.0 && phVal in 7.0..8.24 -> {
+                            viewModel.isScreen1Visible                  = true
+                            viewModel.isScreenCO2100_160_H_0_100Visible = false
+                            viewModel.isScreenCO2100_160_H_100_160Visible = false
+                            viewModel.isScreenCO2_0_100_h100_160Visible  = false
+                        }
+                        co2Val in 100.0..160.0 && phVal in 7.0..8.24 -> {
+                            viewModel.isScreenCO2100_160_H_0_100Visible   = true
+                            viewModel.isScreenCO2100_160_H_100_160Visible = false
+                            viewModel.isScreenCO2_0_100_h100_160Visible   = false
+                            viewModel.isScreen1Visible                     = false
+                        }
+                        co2Val in 100.0..160.0 && phVal in 6.8..7.0 -> {
+                            viewModel.isScreenCO2100_160_H_100_160Visible = true
+                            viewModel.isScreen1Visible                     = false
+                            viewModel.isScreenCO2_0_100_h100_160Visible   = false
+                            viewModel.isScreenCO2100_160_H_0_100Visible   = false
+                        }
+                        co2Val in 0.0..100.0 && phVal in 6.8..7.0 -> {
+                            viewModel.isScreenCO2_0_100_h100_160Visible   = true
+                            viewModel.isScreen1Visible                     = false
+                            viewModel.isScreenCO2100_160_H_0_100Visible   = false
+                            viewModel.isScreenCO2100_160_H_100_160Visible = false
+                        }
                     }
-                    else if (viewModel.txCO2arterial.value.toFloat() in 100.0..160.0 && viewModel.txPharterial.value.toFloat() in 7.0..8.24) {
-                        viewModel.isScreenCO2100_160_H_0_100Visible = true
-                        viewModel.isScreenCO2100_160_H_100_160Visible = false
-                        viewModel.isScreenCO2_0_100_h100_160Visible = false
-                        viewModel.isScreen1Visible = false
 
-
-                    }
-                    else if (viewModel.txCO2arterial.value.toFloat() in 100.0..160.0 && viewModel.txPharterial.value.toFloat() in 6.8 .. 7.0){
-                        viewModel.isScreenCO2100_160_H_100_160Visible = true
-                        viewModel.isScreen1Visible = false
-                        viewModel.isScreenCO2_0_100_h100_160Visible = false
-                        viewModel.isScreenCO2100_160_H_0_100Visible = false
-
-
-                    }
-                    else if (viewModel.txCO2arterial.value.toFloat() in 0.0..100.0 && viewModel.txPharterial.value.toFloat() in 6.8 .. 7.0){
-                        viewModel.isScreenCO2_0_100_h100_160Visible = true
-                        viewModel.isScreen1Visible = false
-                        viewModel.isScreenCO2100_160_H_0_100Visible = false
-                        viewModel.isScreenCO2100_160_H_100_160Visible = false
-
-                    }
                     navController.popBackStack()
-                } else {
 
-                    Toast.makeText(context, "Ingrese valores numéricos válidos.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Ingrese valores numéricos válidos.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-            }) {
+            }
+        ) {
             Text("Guardar y volver")
         }
     }
