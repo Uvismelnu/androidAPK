@@ -225,7 +225,7 @@ fun Chlorine(
             },
             modifier = Modifier.padding(8.dp)
         ) {
-            Text("Calcular y volver")
+            Text("Calcular y volver")//Guardia
         }
     }
 }
